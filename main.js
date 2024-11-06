@@ -1,6 +1,8 @@
 let ball;
 let lifebar;
 
+let bag = new Bag([], 0);
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
@@ -22,6 +24,7 @@ function draw() {
   }
 
   lifebar.draw();
+  bag.draw();
 }
 
 function startPoint() {
@@ -44,6 +47,7 @@ function startGame() {
     "blue",
     25
   );
+
   lifebar = new Lifebar(5);
 }
 
