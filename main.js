@@ -2,17 +2,16 @@ let ball;
 let lifebar;
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(windowWidth, windowHeight);
   noStroke();
   startGame();
 }
 
 function draw() {
+  background("#ccd5ae");
 
-  background(220);
-  
   ball.draw();
-  
+
   if (pointOver()) {
     lifebar.damage();
     if (gameOver()) {
@@ -21,25 +20,40 @@ function draw() {
       startPoint();
     }
   }
-  
+
   lifebar.draw();
-  
 }
 
 function startPoint() {
-  ball = new Ball(width / 2, height / 2, Math.random() * 3 - 1, Math.random() * 3 - 1, "blue", 25);
+  ball = new Ball(
+    width / 2,
+    height / 2,
+    Math.random() * 3 - 1,
+    Math.random() * 3 - 1,
+    "blue",
+    25
+  );
 }
 
 function startGame() {
-  ball = new Ball(width / 2, height / 2, Math.random() * 3 - 1, Math.random() * 3 - 1, "blue", 25);
+  ball = new Ball(
+    width / 2,
+    height / 2,
+    Math.random() * 3 - 1,
+    Math.random() * 3 - 1,
+    "blue",
+    25
+  );
   lifebar = new Lifebar(5);
 }
 
 function pointOver() {
-  return ball.coordinate.x > width + ball.radius ||
-         ball.coordinate.x < 0 - ball.radius ||
-         ball.coordinate.y > height + ball.radius ||
-         ball.coordinate.y < 0 - ball.radius;
+  return (
+    ball.coordinate.x > width + ball.radius ||
+    ball.coordinate.x < 0 - ball.radius ||
+    ball.coordinate.y > height + ball.radius ||
+    ball.coordinate.y < 0 - ball.radius
+  );
 }
 
 function gameOver() {
@@ -47,15 +61,15 @@ function gameOver() {
 }
 
 function touchStarted() {
-  let directionX = ball.coordinate.x - mouseX;
-  let directionY = ball.coordinate.y - mouseY;
-  
+  let directionX = ball.coordinate.x + mouseX;
+  let directionY = ball.coordinate.y + mouseY;
+
   let magnitude = dist(ball.coordinate.x, ball.coordinate.y, mouseX, mouseY);
   let normalizedX = directionX / magnitude;
   let normalizedY = directionY / magnitude;
-  
+
   let newSpeedX = normalizedX * 3;
   let newSpeedY = normalizedY * 3;
-  
-  ball.setSpeed({x: newSpeedX, y: newSpeedY});
+
+  ball.setSpeed({ x: newSpeedX, y: newSpeedY });
 }
