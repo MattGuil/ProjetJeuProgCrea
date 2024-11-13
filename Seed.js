@@ -1,9 +1,10 @@
 class Seed {
-    constructor(x, y) {
+    constructor(x, y, value) {
         this.coordinate = {
             x: x,
             y: y
         };
+        this.value = value;
     }
 
     draw() {

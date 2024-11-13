@@ -2,16 +2,27 @@ class Human {
     constructor(pX, pY) {
         this.x = pX;
         this.y = pY;
-        this.radius = 10;
+        this.diameter = 20;
+        this.figure = random(0, 2); // TODO : ajuster pour avoir le pied, une main, ou autre forme...
     }
 
     draw() {
         fill(0, 0, 0);
-        circle(this.x, this.y, this.radius, this.radius);
-        this.radius+=2;
+        circle(this.x, this.y, this.diameter);
+        circle(this.x-(this.diameter/2), this.y, this.diameter/2);
+        circle(this.x-(this.diameter/3), this.y-(this.diameter/2), this.diameter/2);
+        circle(this.x, this.y-(this.diameter/2), this.diameter/2);
+        circle(this.x+(this.diameter/3), this.y-(this.diameter/2), this.diameter/2);
+        circle(this.x+(this.diameter/3), this.y, this.diameter/2);
+        this.diameter+= 2;
     }
 
-    detectInsect() {
-        console.log("detectInsect");
+    detectInsect(insectX, insectY) {
+        if (this.x - (this.diameter / 2) <= insectX && insectX <= this.x + (this.diameter / 2)) {
+            if (this.y - (this.diameter / 2) <= insectY && insectY <= this.y + (this.diameter / 2)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

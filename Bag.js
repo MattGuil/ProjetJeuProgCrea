@@ -16,11 +16,6 @@ class Bag {
   draw() {
     fill(0, 0, 0);
     rect(this.bagX, this.bagY, 65, 65);
-    if (this.isOpen) {
-      console.log("On dessine ouvert");
-    } else {
-      console.log("on dessine fermé");
-    }
   }
 
   addItem(pItem) {

@@ -7,9 +7,19 @@ class Marie {
     this.speed = 5;
     this.target = null;
     this.targetIndex = -1;
+    this.score = 0;
+    this.isEating = false;
+    this.progressbar = null;
   }
 
   lookForClosestSeed(seeds) {
+    if (this.isEating) {
+      let bRes = this.progressbar.update();
+      if (bRes) {
+        this.isEating = false;
+      }
+    }
+
     let closestSeed = null;
     let minDistance = Infinity;
 
@@ -46,12 +56,14 @@ class Marie {
   }
 
   eatSeed(seeds, seedIndex) {
-    seeds.splice(seedIndex, 1);
+    const seed = seeds[seedIndex];
     this.target = null;
+    this.isEating = true;
+    this.progressbar = new Progressbar(seed.value);
   }
 
   draw() {
-    fill("black");
+    fill(255, 0, 0);
     circle(this.coordinate.x, this.coordinate.y, 25);
   }
 }
