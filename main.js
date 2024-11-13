@@ -1,56 +1,61 @@
-let ball;
-let lifebar;
-
+let timer;
+let marie;
 let bag;
 
+let seeds = [];
+
+let humans = [];
+let bGameOver = false;
+
 function setup() {
+  frameRate(30); // 30 FPS
   createCanvas(windowWidth, windowHeight);
   noStroke();
+
   startGame();
-  bag = new Bag([], 25, windowHeight - 90);
+  setInterval(() => {
+    timer--;
+  }, 1000);
 }
 
 function draw() {
   background("#ccd5ae");
+  // ajout d'une ombre toutes les 5 secondes
+  if (frameCount % 60 === 0 ) { // 1 pieds toutes les deux secondes (60 Frames, 30FPS)
+    humans.push(new Human(random(50, width-50), random(50, height-50)));
+  }
+
+
+  humans = humans.filter(h => {
+    //console.log(h.x, h.y, h.radius);
+    h.draw();
+    return h.radius < 150;
+  });
+
+  // fin de partie
+  if ((timer === 0) || (bGameOver)) {
+    //console.log("fin de partie");
+    noLoop();
+    exit();
+  }
+
+  fill(0, 0, 0);
+  text(timer, 100, 100);
+
+  marie.lookForClosestSeed(seeds);
+  marie.moveTowardTarget();
+
+  seeds.forEach(seed => seed.draw());
+
+  marie.draw();
 
   bag.draw();
 }
 
-function startPoint() {
-  ball = new Ball(
-    width / 2,
-    height / 2,
-    Math.random() * 3 - 1,
-    Math.random() * 3 - 1,
-    "blue",
-    25
-  );
-}
-
 function startGame() {
-  ball = new Ball(
-    width / 2,
-    height / 2,
-    Math.random() * 3 - 1,
-    Math.random() * 3 - 1,
-    "blue",
-    25
-  );
-
-  lifebar = new Lifebar(5);
-}
-
-function pointOver() {
-  return (
-    ball.coordinate.x > width + ball.radius ||
-    ball.coordinate.x < 0 - ball.radius ||
-    ball.coordinate.y > height + ball.radius ||
-    ball.coordinate.y < 0 - ball.radius
-  );
-}
-
-function gameOver() {
-  return lifebar.current == 0;
+  timer = 60;
+  marie = new Marie(width / 2, height / 2);
+  bag = new Bag([], 25, windowHeight - 90);
 }
 
 function touchStarted() {
@@ -63,17 +68,8 @@ function touchStarted() {
     } else {
       bag.openBag();
     }
+  } else {
+    // Drop a seed
+    seeds.push(new Seed(mouseX, mouseY));
   }
-
-  let directionX = ball.coordinate.x + mouseX;
-  let directionY = ball.coordinate.y + mouseY;
-
-  let magnitude = dist(ball.coordinate.x, ball.coordinate.y, mouseX, mouseY);
-  let normalizedX = directionX / magnitude;
-  let normalizedY = directionY / magnitude;
-
-  let newSpeedX = normalizedX * 3;
-  let newSpeedY = normalizedY * 3;
-
-  ball.setSpeed({ x: newSpeedX, y: newSpeedY });
 }

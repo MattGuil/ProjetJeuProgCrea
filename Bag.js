@@ -24,18 +24,18 @@ class Bag {
   }
 
   addItem(pItem) {
-    console.log("addItem");
+    //console.log("addItem");
     this.bagItems.push(pItem);
     this.bagSize++;
   }
 
   openBag() {
-    console.log("openBag");
+    //console.log("openBag");
     this.isOpen = true;
   }
 
   closeBag() {
-    console.log("closeBag");
+    //console.log("closeBag");
     this.isOpen = false;
   }
 }
