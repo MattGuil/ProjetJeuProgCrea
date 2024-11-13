@@ -5,12 +5,12 @@ class Bag {
     this.bagSize = 0;
   }*/
 
-  constructor(pItems, pSize) {
-    this.bagX = 25;
-    this.bagY = windowHeight - 90;
+  constructor(pItems, pX, pY) {
+    this.bagX = pX;
+    this.bagY = pY;
     this.isOpen = false;
     this.bagItems = pItems;
-    this.bagCount = pSize;
+    this.bagCount = this.bagItems.size;
   }
 
   draw() {

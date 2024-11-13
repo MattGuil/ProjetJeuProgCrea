@@ -1,29 +1,18 @@
 let ball;
 let lifebar;
 
-let bag = new Bag([], 0);
+let bag;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
   startGame();
+  bag = new Bag([], 25, windowHeight - 90);
 }
 
 function draw() {
   background("#ccd5ae");
 
-  ball.draw();
-
-  if (pointOver()) {
-    lifebar.damage();
-    if (gameOver()) {
-      startGame();
-    } else {
-      startPoint();
-    }
-  }
-
-  lifebar.draw();
   bag.draw();
 }
 
@@ -65,6 +54,17 @@ function gameOver() {
 }
 
 function touchStarted() {
+  // Gestion de l'ouverture/fermeture du sac, au clic
+  let distBagMouse = dist(bag.bagX, bag.bagY, mouseX, mouseY);
+  //console.log(distBagMouse);
+  if (distBagMouse < 90) {
+    if (bag.isOpen) {
+      bag.closeBag();
+    } else {
+      bag.openBag();
+    }
+  }
+
   let directionX = ball.coordinate.x + mouseX;
   let directionY = ball.coordinate.y + mouseY;
 

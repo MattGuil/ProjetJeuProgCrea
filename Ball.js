@@ -4,6 +4,7 @@ class Ball {
       x: posX,
       y: posY,
     };
+
     this.speed = {
       x: speedX,
       y: speedY,
