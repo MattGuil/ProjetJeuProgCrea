@@ -1,14 +1,14 @@
 class Seed {
-    constructor(x, y, value) {
-        this.coordinate = {
-            x: x,
-            y: y
-        };
-        this.value = value;
-    }
+  constructor(x, y, value) {
+    this.coordinate = {
+      x: x,
+      y: y,
+    };
+    this.value = value;
+  }
 
-    draw() {
-        fill("white");
-        circle(this.coordinate.x, this.coordinate.y, 10);
-    }
+  draw() {
+    fill("white");
+    circle(this.coordinate.x, this.coordinate.y, this.value);
+  }
 }
