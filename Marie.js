@@ -15,14 +15,12 @@ class Marie {
   lookForClosestSeed(seeds) {
     if (this.isEating) {
       this.progressbar.draw(this.coordinate.x - 5, this.coordinate.y - 20);
-      let bRes = this.progressbar.update();
-      if (bRes) {
-        console.log("a fini de mangé");
+      let bResult = this.progressbar.update();
+      if (bResult) {
+        // On modifie le score, on enlève la graine et on nettoie les variables d'états
         this.score += seeds[this.targetIndex].value;
-
         seeds.splice(this.targetIndex, 1);
 
-        // Réinitialise les états
         this.isEating = false;
         this.progressbar = null;
         this.targetIndex = -1;

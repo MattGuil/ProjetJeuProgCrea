@@ -1,13 +1,16 @@
 let timer = 15;
+let infinityTimer = 0;
+
 let marie;
 let seeds;
 let humans;
+
 let bGameOver;
 let bStartGame = false;
 let isDarkMode = false;
 
 // Game Mode selection
-let toggleButton, toggleCircle;
+let dayModeButton, nightModeButton;
 let gameModeLabel;
 
 // Timer selection
@@ -17,14 +20,12 @@ let gameTimerLabel;
 let startGameButton;
 
 function setup() {
-  frameRate(30); // Définir à 30 FPS
+  frameRate(30); // 30 FPS
   createCanvas(windowWidth, windowHeight);
   noStroke();
 
   drawHomeScreen();
-
   drawGameModeSelection();
-
   drawGameTimeSelection();
 
   startGameButton = createButton("Lancé la partie !");
@@ -32,7 +33,7 @@ function setup() {
   startGameButton.position(width / 2 - 50, timerSlider.y + 50);
   startGameButton.mousePressed(startGame);
 
-  // Écouter la touche 'Enter' pour démarrer le jeu
+  // interaction clavier avec la touche ENTER pour lancer la partie
   keyPressed = () => {
     if (keyCode === ENTER) {
       startGame();
@@ -41,6 +42,8 @@ function setup() {
 }
 
 function drawHomeScreen() {
+  // TODO : ajouter un cercle au fond, positionner les boutons (+ design)
+  // TODO : mode nuit, changer le background plus sombre... effet classe
   background("#a7c957");
   fill("#386641");
   circle(width / 42, height + height / 8, width / 4);
@@ -53,49 +56,26 @@ function drawHomeScreen() {
 }
 
 function drawGameModeSelection() {
-  toggleButton = createButton("");
-  toggleButton.size(80, 40);
-  toggleButton.style("background-color", "#000");
-  toggleButton.style("border-radius", "50px");
-  toggleButton.style("border", "2px solid #fff");
-  toggleButton.mousePressed(toggleGameMode); // interaction
+  dayModeButton = createButton("Jour");
+  dayModeButton.size(100, 40);
+  dayModeButton.mousePressed(() => {
+    isDarkMode = false;
+  });
+  dayModeButton.position(width / 2 - 100, height / 4);
 
-  // le cercle qui va bougé dans le bouton
-  toggleCircle = createDiv();
-  toggleCircle.size(30, 30);
-  toggleCircle.style("background-color", "#fff");
-  toggleCircle.style("border-radius", "50px");
-  toggleCircle.style("transition", "0.5s");
-  toggleButton.child(toggleCircle);
+  nightModeButton = createButton("Nuit");
+  nightModeButton.size(100, 40);
+  nightModeButton.mousePressed(() => {
+    isDarkMode = true;
+  });
+  nightModeButton.position(width / 2 + 100, height / 4);
 
-  toggleButton.position(width / 2 - 100, height / 2 - 50);
-
-  // Label d'information
-  gameModeLabel = createDiv("Mode : Jour");
+  // Label d'information on utilise une div et pas un text pour pouvoir écrire derrière plus facilement
+  gameModeLabel = createDiv("");
   gameModeLabel.style("font-size", "24px");
   gameModeLabel.style("color", "#000");
   gameModeLabel.style("font-weight", "bold");
-  gameModeLabel.position(
-    toggleButton.x + toggleButton.width + 20,
-    toggleButton.y
-  );
-}
-
-function toggleGameMode() {
-  isDarkMode = !isDarkMode;
-  let circle = toggleButton.elt.querySelector("div");
-
-  if (isDarkMode) {
-    circle.style.transform = "translateX(35px)";
-    circle.style.backgroundColor = "#000";
-    toggleButton.style("background-color", "#fff");
-    gameModeLabel.html("Mode : Nuit");
-  } else {
-    circle.style.transform = "translateX(0px)";
-    circle.style.backgroundColor = "#fff";
-    toggleButton.style("background-color", "#000");
-    gameModeLabel.html("Mode : Jour");
-  }
+  gameModeLabel.position(nightModeButton.x, nightModeButton.y + 80);
 }
 
 function drawGameTimeSelection() {
@@ -111,26 +91,41 @@ function drawGameTimeSelection() {
 }
 
 function startGame() {
-  toggleButton.remove();
-  gameModeLabel.remove();
-  timerSlider.remove();
-  gameTimerLabel.remove();
-  startGameButton.remove();
-  bStartGame = true;
-  timer = timerSlider.value();
-  if (timer !== 0) {
-    setInterval(() => {
-      timer--;
-    }, 1000);
-  }
-  initGame();
-}
+  /* Timeout nécessaire pour éviter que le clique sur le bouton de lancement de jeu 
+  soit considéré comme un clique qui dépose une première graine */
+  setTimeout(() => {
+    // Nettoyage du canvas
+    dayModeButton.remove();
+    nightModeButton.remove();
+    gameModeLabel.remove();
+    timerSlider.remove();
+    gameTimerLabel.remove();
+    startGameButton.remove();
 
-function initGame() {
-  humans = [];
-  seeds = [];
-  marie = new Marie(width / 2, height / 2);
-  bGameOver = false;
+    // Initialisation du timer
+
+    if (timerSlider.value() !== 0) {
+      infinityTimer = -1;
+      timer = timerSlider.value();
+      setInterval(() => {
+        timer--;
+      }, 1000);
+    } else {
+      timer = -1;
+      infinityTimer = 0;
+      // On sauvegarde le temps en mode infini pour que le joueur puisse flex ensuite
+      setInterval(() => {
+        infinityTimer++;
+      }, 1000);
+    }
+
+    // Initialisation du jeu
+    bStartGame = true;
+    bGameOver = false;
+    humans = [];
+    seeds = [];
+    marie = new Marie(width / 2, height / 2);
+  }, 100);
 }
 
 function touchStarted() {
@@ -142,51 +137,62 @@ function touchStarted() {
 function draw() {
   // le jeu n'a pas start,
   if (!bStartGame) {
+    gameModeLabel.html(
+      isDarkMode ? "Plongeon dans l'obscurité" : "Ballade en journée"
+    );
     gameTimerLabel.html("Temps de survie : " + timerSlider.value() + "s");
     if (timerSlider.value() === 0) {
       gameTimerLabel.html("On part sur un temps ∞ !");
     }
-  } else {
-    background("#a3b18a");
-    // ajout d'une ombre toutes les 5 secondes
-    if (frameCount % 60 === 0) {
-      // 1 pieds toutes les deux secondes (60 Frames, 30FPS)
-      humans.push(
-        new Human(random(100, width - 100), random(200, height - 150))
-      );
-    }
-
-    humans = humans.filter((h) => {
-      h.draw();
-      if (h.diameter > 185) {
-        let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
-        if (touche) {
-          bGameOver = true; // C'est fini
-        }
-      }
-      return h.diameter < 230;
-    });
-
-    // fin de partie
-    if (timer === 0 || bGameOver) {
-      console.log("fin de partie");
-      console.log("SCORE = ", marie.score);
-      if (!bGameOver) {
-        console.log("Bravo, vous ne vous êtes pas fait écrasé !");
-      } else {
-        console.log("Dommage, il vous restait " + timer + " secondes à tenir");
-      }
-      initGame();
-    }
-
-    fill(0, 0, 0);
-    text(timer, 50, 100);
-
-    marie.lookForClosestSeed(seeds);
-    marie.moveTowardTarget();
-
-    seeds.forEach((seed) => seed.draw());
-
-    marie.draw();
+    return;
   }
+
+  background("#a3b18a");
+  // ajout d'une ombre toutes les 5 secondes
+  if (frameCount % 60 === 0) {
+    // 1 pieds toutes les deux secondes (60 Frames, 30FPS)
+    humans.push(new Human(random(100, width - 100), random(200, height - 150)));
+  }
+
+  humans = humans.filter((h) => {
+    h.draw();
+    if (h.diameter > 185) {
+      let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
+      if (touche) {
+        bGameOver = true; // C'est fini
+      }
+    }
+    return h.diameter < 230;
+  });
+
+  // fin de partie
+  // TODO : relancer une partie, menu stop ?
+
+  if (timer === 0 || bGameOver) {
+    console.log("fin de partie");
+    console.log("SCORE = ", marie.score);
+    if (!bGameOver) {
+      console.log("Bravo, vous ne vous êtes pas fait écrasé !");
+    } else {
+      console.log("Dommage, il vous restait " + timer + " secondes à tenir");
+      console.log("hey :", infinityTimer);
+    }
+    initGame(); // arrêt via une erreur pour le moment, ça m'arrange
+  }
+
+  fill(0, 0, 0);
+  if (timer === -1) {
+    text("infini", 50, 100);
+  } else {
+    text(timer, 50, 100);
+  }
+
+  marie.lookForClosestSeed(seeds);
+  marie.moveTowardTarget();
+
+  seeds.forEach((seed) => seed.draw());
+
+  marie.draw();
 }
+
+// TODO : faire un mode nuit
