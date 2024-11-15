@@ -3,34 +3,36 @@ let infinityTimer = 0;
 let saveTimer; // On garde en mémoire le temps
 let intervalTimer;
 
-let marie;
-let seeds;
-let humans;
+let marie, seeds, humans;
 
 let bGameOver;
 let bStartGame = false;
-let isDarkMode = false;
+let isNightMode = false;
 let bGamePaused = false; // figer le jeu en fin de partie
 
 // Game Mode selection
-let dayModeButton, nightModeButton;
-let gameModeLabel;
+let dayModeButton, nightModeButton, gameModeLabel;
 
 // Timer selection
-let timerSlider;
-let gameTimerLabel;
+let timerSlider, gameTimerLabel;
 
 let startGameButton;
 let infoButton;
+let endGamePopUp;
 
-let endGamePopup;
+// Ajout d'un plan pour le mode nuit
+let nightCanvas;
 
-/* Fonction qui sert de point d'entrée du jeu. On définit certains paramètres et on dessine une première fois l'accueil.
-Tout ce qui est impacté par un changement lié à une interaction/animation est dessiné dans draw() directement */
+/* Fonction qui sert de point d'entrée du jeu. On définit certains paramètres 
+et on dessine une première fois l'accueil.Tout ce qui est impacté par un changement 
+lié à une interaction/animation est dessiné dans draw() directement */
 function setup() {
   frameRate(30); // 30 FPS
   createCanvas(windowWidth, windowHeight);
   noStroke();
+
+  nightCanvas = createGraphics(windowWidth, windowHeight);
+  nightCanvas.noStroke();
 
   drawGameModeSelection();
   drawGameTimeSelection();
@@ -39,14 +41,14 @@ function setup() {
   startGameButton.size(100, 40);
   startGameButton.position(width / 2 - 50, timerSlider.y + 50);
   startGameButton.mousePressed(() => {
-    // Nettoyage du canvas avec l'accueil
+    // Nettoyage du canvas avec l'accueil et lancement du jeu
     dayModeButton.remove();
     nightModeButton.remove();
     infoButton.remove();
     timerSlider.remove();
     gameTimerLabel.remove();
     startGameButton.remove();
-    // lancement du jeu
+
     startGame();
   });
 
@@ -54,7 +56,7 @@ function setup() {
   infoButton.size(width / 16, width / 16);
   infoButton.position(width - width / 14, height / 24);
   infoButton.style("border-radius", "100px");
-  infoButton.mousePressed(displayInfoPopUp);
+  infoButton.mousePressed(showInformationsPopUp);
 
   // interaction clavier avec la touche ENTER pour lancer la partie
   keyPressed = () => {
@@ -64,26 +66,20 @@ function setup() {
   };
 }
 
-function displayInfoPopUp() {
-  // TODO : écrire les règles du jeu dans la pop up ?
+function showInformationsPopUp() {
   alert(
     "Le saviez-vous ? \nIl s'agit d'un projet étudiant du M2 CIM (DT), développé par Matthieu Guillemin et Guillaume Hostache. \nOn remercie les livres \"Drôles de petites bêtes\" pour l'inspiration :)"
   );
 }
 
 function drawHomeScreen() {
-  if (isDarkMode) {
-    background("#2c3e50");
-    fill("#bdc3c7");
-  } else {
-    background("#a7c957");
-    fill("#386641");
-  }
+  background(isNightMode ? "#2c3e50" : "#a7c957");
 
+  fill(isNightMode ? "#bdc3c7" : "#386641");
   circle(width / 42, height + height / 8, width / 4);
   circle(width, 0, width / 4);
 
-  fill(isDarkMode ? "#ffffff" : "#000000");
+  fill(isNightMode ? "#ffffff" : "#000000");
   textAlign(CENTER, CENTER);
   textSize(42);
   text("Insecte-qui-peut !", width / 2, height / 6);
@@ -93,7 +89,7 @@ function drawGameModeSelection() {
   dayModeButton = createButton("Jour");
   dayModeButton.size(100, 40);
   dayModeButton.mousePressed(() => {
-    isDarkMode = false;
+    isNightMode = false;
     updateButtonStyles();
   });
   dayModeButton.position(width / 2 - 110, height / 3);
@@ -101,7 +97,7 @@ function drawGameModeSelection() {
   nightModeButton = createButton("Nuit");
   nightModeButton.size(100, 40);
   nightModeButton.mousePressed(() => {
-    isDarkMode = true;
+    isNightMode = true;
     updateButtonStyles();
   });
   nightModeButton.position(width / 2 + 10, height / 3);
@@ -110,10 +106,13 @@ function drawGameModeSelection() {
 }
 
 function updateButtonStyles() {
-  dayModeButton.style("background-color", isDarkMode ? "#7f8c8d" : "#ffffff");
-  dayModeButton.style("color", isDarkMode ? "#ecf0f1" : "#000000");
-  nightModeButton.style("background-color", isDarkMode ? "#34495e" : "#bdc3c7");
-  nightModeButton.style("color", isDarkMode ? "#ecf0f1" : "#2c3e50");
+  dayModeButton.style("background-color", isNightMode ? "#7f8c8d" : "#ffffff");
+  dayModeButton.style("color", isNightMode ? "#ecf0f1" : "#000000");
+  nightModeButton.style(
+    "background-color",
+    isNightMode ? "#34495e" : "#bdc3c7"
+  );
+  nightModeButton.style("color", isNightMode ? "#ecf0f1" : "#2c3e50");
 }
 
 function drawGameTimeSelection() {
@@ -153,79 +152,45 @@ function startGame() {
     bGamePaused = false;
     humans = [];
     seeds = [];
-    marie = new Marie(width / 2, height / 2);
+    marie = new Marie(width / 2, height / 2, isNightMode ? nightCanvas : null);
   }, 100);
 }
 
 // à chaque clique/touche, on dépose une graine de taille aléatoire
 function touchStarted() {
   if (bStartGame && !bGamePaused) {
-    seeds.push(new Seed(mouseX, mouseY, Math.floor(Math.random() * 25) + 5));
+    let seed = new Seed(mouseX, mouseY, Math.floor(Math.random() * 25) + 5);
+    if (isNightMode) {
+      let distanceMarieSeed = dist(
+        marie.coordinate.x,
+        marie.coordinate.y,
+        mouseX,
+        mouseY
+      );
+      if (distanceMarieSeed < 75) {
+        seeds.push(seed);
+      }
+    } else {
+      seeds.push(seed);
+    }
   }
 }
 
-/* Boucle principale du jeu : Si le jeu n'a pas commencé, on dessine certains éléments 
-et certaines animation de l'accueil. Quand la partie commence, gère le jeu en fonction des paramètres de la partie. */
-function draw() {
-  if (!bStartGame) {
-    drawHomeScreen();
-
-    gameTimerLabel.style("color", isDarkMode ? "#ffffff" : "#000000");
-
-    gameTimerLabel.html(
-      "Arriverez-vous à survivre pendant " +
-        timerSlider.value() +
-        " secondes..."
-    );
-    if (timerSlider.value() === 0) {
-      gameTimerLabel.html("Survivez le plus longtemps possible !");
-    }
-    return;
-  }
-
-  if (bGamePaused) return; // fige la partie
-
-  if (!isDarkMode) {
-    background("#a3b18a");
-
-    fill("black");
-    textSize(24);
-    if (timer === -1) {
-      text("∞", width / 2, height / 24);
-    } else {
-      text(timer, width / 2, height / 24);
-    }
-    textSize(18);
-    text("SCORE " + marie.score, width / 2, height / 10);
-
-    if (frameCount % 60 === 0) {
-      humans.push(new Human(random(0, width), random(150, height)));
-    }
-
-    humans = humans.filter((h) => {
-      h.draw();
-      if (h.diameter > 185) {
-        let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
-        if (touche) {
-          bGameOver = true;
-        }
-      }
-      return h.diameter < 230;
-    });
-
-    marie.lookForClosestSeed(seeds);
-    marie.moveTowardTarget();
-
-    seeds.forEach((seed) => seed.draw());
-
-    marie.draw();
-    updateGameSituation();
+function drawGameInfo() {
+  fill(!isNightMode ? "black" : "white");
+  textSize(24);
+  if (timer === -1) {
+    text("∞", width / 2, height / 24);
   } else {
-    console.log("DarkMode à implémenter");
+    text(timer, width / 2, height / 24);
   }
+  textSize(18);
+  text("SCORE " + marie.score, width / 2, height / 10);
 }
 
 function updateGameSituation() {
+  /* 3 motifs d'arrêts : Si le joueur a été écrasé (bGameOver) ou bien 
+  Si la partie est terminé (temps limité) ou Si la partie est infini, et que le joueur a été écrasé */
   if ((timer === -1 && bGameOver) || timer === 0 || bGameOver) {
     bGamePaused = true;
     let title, timeMessage, scoreMessage;
@@ -245,7 +210,7 @@ function updateGameSituation() {
 }
 
 function drawEndGamePopUp(title, timeMessage, scoreMessage) {
-  endGamePopup = createDiv(
+  endGamePopUp = createDiv(
     "<h3>" +
       title +
       "</h3><p>" +
@@ -255,38 +220,101 @@ function drawEndGamePopUp(title, timeMessage, scoreMessage) {
       "</p>"
   );
 
-  endGamePopup.style("padding", "15px");
-  endGamePopup.style("background-color", isDarkMode ? "#34495e" : "#ecf0f1");
-  endGamePopup.style("color", isDarkMode ? "#ecf0f1" : "#34495e");
-  endGamePopup.style("position", "absolute");
-  endGamePopup.style("top", "50%");
-  endGamePopup.style("left", "50%");
-  endGamePopup.style("transform", "translate(-50%, -50%)");
-  endGamePopup.style("text-align", "center");
-  endGamePopup.style("width", "500px");
+  endGamePopUp.style("padding", "15px");
+  endGamePopUp.style("background-color", isNightMode ? "#34495e" : "#ecf0f1");
+  endGamePopUp.style("color", isNightMode ? "#ecf0f1" : "#34495e");
+  endGamePopUp.style("position", "absolute");
+  endGamePopUp.style("top", "50%");
+  endGamePopUp.style("left", "50%");
+  endGamePopUp.style("transform", "translate(-50%, -50%)");
+  endGamePopUp.style("text-align", "center");
+  endGamePopUp.style("width", "500px");
 
   let newGameButton = createButton("Nouvelle partie");
-  newGameButton.parent(endGamePopup);
-  newGameButton.mousePressed(resetGame);
+  newGameButton.parent(endGamePopUp);
+  newGameButton.mousePressed(newGame);
 
   let restartButton = createButton("Rejouer le niveau");
-  restartButton.parent(endGamePopup);
+  restartButton.parent(endGamePopUp);
   restartButton.mousePressed(replayGame);
 }
 
+// relance une partie identique
 function replayGame() {
-  if (endGamePopup) endGamePopup.remove();
+  if (endGamePopUp) endGamePopUp.remove();
 
   startGame();
 }
 
-function resetGame() {
+// redirige vers l'écran d'accueil
+function newGame() {
   timer = timerSlider.value();
   infinityTimer = 0;
+  isNightMode = false;
 
   bStartGame = false;
 
-  if (endGamePopup) endGamePopup.remove();
+  if (endGamePopUp) endGamePopUp.remove();
 
   setup();
+}
+
+/* Boucle principale du jeu : Si le jeu n'a pas commencé, on dessine certains éléments 
+et certaines animations de l'accueil. Quand la partie commence, gère le jeu 
+en fonction des paramètres de la partie. */
+function draw() {
+  if (!bStartGame) {
+    drawHomeScreen();
+
+    gameTimerLabel.style("color", isNightMode ? "#ffffff" : "#000000");
+
+    gameTimerLabel.html(
+      "Arriverez-vous à survivre pendant " +
+        timerSlider.value() +
+        " secondes..."
+    );
+
+    if (timerSlider.value() === 0) {
+      gameTimerLabel.html("Survivez le plus longtemps possible !");
+    }
+    return;
+  }
+
+  if (bGamePaused) return; // On fige la partie -> utile pour les fins de partie
+
+  background("#a3b18a");
+
+  // On génère une ombre d'ennemi toutes les 30 frames
+  if (frameCount % 30 === 0) {
+    humans.push(new Human(random(0, width), random(150, height), isNightMode));
+  }
+
+  humans = humans.filter((h) => {
+    h.draw();
+    if (h.diameter > 185) {
+      let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
+      if (touche) {
+        bGameOver = true;
+      }
+    }
+    return h.diameter < 190;
+  });
+
+  seeds.forEach((seed) => seed.draw());
+
+  if (isNightMode) {
+    nightCanvas.clear();
+    nightCanvas.fill(0);
+    nightCanvas.rect(0, 0, width, height);
+  }
+
+  marie.draw();
+
+  if (isNightMode) image(nightCanvas, 0, 0);
+
+  marie.lookForClosestSeed(seeds);
+  marie.moveTowardTarget();
+
+  drawGameInfo();
+  updateGameSituation();
 }

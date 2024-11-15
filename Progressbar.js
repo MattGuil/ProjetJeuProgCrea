@@ -1,4 +1,4 @@
-class Progressbar {
+class ProgressBar {
   constructor(seedValue) {
     this.current = 0;
     this.speed = 100 / seedValue;

@@ -1,10 +1,11 @@
 class Marie {
-  constructor(posX, posY) {
+  constructor(posX, posY, pDarkLayer) {
     this.coordinate = {
       x: posX,
       y: posY,
     };
-    this.speed = 5;
+    this.darkLayer = pDarkLayer;
+    this.speed = this.darkLayer ? 3 : 6;
     this.target = null;
     this.targetIndex = -1;
     this.score = 0;
@@ -75,11 +76,21 @@ class Marie {
 
   eatSeed() {
     this.isEating = true;
-    this.progressbar = new Progressbar(this.target.value);
+    this.progressbar = new ProgressBar(this.target.value);
   }
 
   draw() {
-    fill(255, 0, 0);
-    circle(this.coordinate.x, this.coordinate.y, 25);
+    if (this.darkLayer === null) {
+      fill(255, 0, 0);
+      circle(this.coordinate.x, this.coordinate.y, 25);
+    } else {
+      // Utilisation du mode gomme pour dessiner la vision de Marie en mode nuit
+      this.darkLayer.erase();
+      this.darkLayer.circle(marie.coordinate.x, marie.coordinate.y, 150);
+      this.darkLayer.noErase();
+
+      this.darkLayer.fill(255, 0, 0);
+      this.darkLayer.circle(this.coordinate.x, this.coordinate.y, 25);
+    }
   }
 }
