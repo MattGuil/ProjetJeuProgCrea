@@ -291,7 +291,7 @@ function draw() {
 
   humans = humans.filter((h) => {
     h.draw();
-    if (h.diameter > 185) {
+    if (h.diameter > 150) {
       let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
       if (touche) {
         bGameOver = true;
