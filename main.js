@@ -1,5 +1,7 @@
 let timer = 15;
 let infinityTimer = 0;
+let saveTimer; // On garde en mémoire le temps
+let intervalTimer;
 
 let marie;
 let seeds;
@@ -8,6 +10,7 @@ let humans;
 let bGameOver;
 let bStartGame = false;
 let isDarkMode = false;
+let bGamePaused = false; // figer le jeu en fin de partie
 
 // Game Mode selection
 let dayModeButton, nightModeButton;
@@ -18,20 +21,40 @@ let timerSlider;
 let gameTimerLabel;
 
 let startGameButton;
+let infoButton;
 
+let endGamePopup;
+
+/* Fonction qui sert de point d'entrée du jeu. On définit certains paramètres et on dessine une première fois l'accueil.
+Tout ce qui est impacté par un changement lié à une interaction/animation est dessiné dans draw() directement */
 function setup() {
   frameRate(30); // 30 FPS
   createCanvas(windowWidth, windowHeight);
   noStroke();
 
-  drawHomeScreen();
   drawGameModeSelection();
   drawGameTimeSelection();
 
-  startGameButton = createButton("Lancé la partie !");
-  startGameButton.size(130, 40);
+  startGameButton = createButton("Jouer");
+  startGameButton.size(100, 40);
   startGameButton.position(width / 2 - 50, timerSlider.y + 50);
-  startGameButton.mousePressed(startGame);
+  startGameButton.mousePressed(() => {
+    // Nettoyage du canvas avec l'accueil
+    dayModeButton.remove();
+    nightModeButton.remove();
+    infoButton.remove();
+    timerSlider.remove();
+    gameTimerLabel.remove();
+    startGameButton.remove();
+    // lancement du jeu
+    startGame();
+  });
+
+  infoButton = createButton("?");
+  infoButton.size(width / 16, width / 16);
+  infoButton.position(width - width / 14, height / 24);
+  infoButton.style("border-radius", "100px");
+  infoButton.mousePressed(displayInfoPopUp);
 
   // interaction clavier avec la touche ENTER pour lancer la partie
   keyPressed = () => {
@@ -41,17 +64,28 @@ function setup() {
   };
 }
 
+function displayInfoPopUp() {
+  // TODO : écrire les règles du jeu dans la pop up ?
+  alert(
+    "Le saviez-vous ? \nIl s'agit d'un projet étudiant du M2 CIM (DT), développé par Matthieu Guillemin et Guillaume Hostache. \nOn remercie les livres \"Drôles de petites bêtes\" pour l'inspiration :)"
+  );
+}
+
 function drawHomeScreen() {
-  // TODO : ajouter un cercle au fond, positionner les boutons (+ design)
-  // TODO : mode nuit, changer le background plus sombre... effet classe
-  background("#a7c957");
-  fill("#386641");
+  if (isDarkMode) {
+    background("#2c3e50");
+    fill("#bdc3c7");
+  } else {
+    background("#a7c957");
+    fill("#386641");
+  }
+
   circle(width / 42, height + height / 8, width / 4);
   circle(width, 0, width / 4);
 
-  fill("#000000");
+  fill(isDarkMode ? "#ffffff" : "#000000");
   textAlign(CENTER, CENTER);
-  textSize(32);
+  textSize(42);
   text("Insecte-qui-peut !", width / 2, height / 6);
 }
 
@@ -60,61 +94,55 @@ function drawGameModeSelection() {
   dayModeButton.size(100, 40);
   dayModeButton.mousePressed(() => {
     isDarkMode = false;
+    updateButtonStyles();
   });
-  dayModeButton.position(width / 2 - 100, height / 4);
+  dayModeButton.position(width / 2 - 110, height / 3);
 
   nightModeButton = createButton("Nuit");
   nightModeButton.size(100, 40);
   nightModeButton.mousePressed(() => {
     isDarkMode = true;
+    updateButtonStyles();
   });
-  nightModeButton.position(width / 2 + 100, height / 4);
+  nightModeButton.position(width / 2 + 10, height / 3);
 
-  // Label d'information on utilise une div et pas un text pour pouvoir écrire derrière plus facilement
-  gameModeLabel = createDiv("");
-  gameModeLabel.style("font-size", "24px");
-  gameModeLabel.style("color", "#000");
-  gameModeLabel.style("font-weight", "bold");
-  gameModeLabel.position(nightModeButton.x, nightModeButton.y + 80);
+  updateButtonStyles();
+}
+
+function updateButtonStyles() {
+  dayModeButton.style("background-color", isDarkMode ? "#7f8c8d" : "#ffffff");
+  dayModeButton.style("color", isDarkMode ? "#ecf0f1" : "#000000");
+  nightModeButton.style("background-color", isDarkMode ? "#34495e" : "#bdc3c7");
+  nightModeButton.style("color", isDarkMode ? "#ecf0f1" : "#2c3e50");
 }
 
 function drawGameTimeSelection() {
-  timerSlider = createSlider(0, 180, timer);
-  timerSlider.position(width / 2 - 150, height / 2 + 50);
-  timerSlider.style("width", "300px");
+  timerSlider = createSlider(0, 300, timer);
+  timerSlider.position(windowWidth / 2 - 162.5, height / 2 + height / 12);
+  timerSlider.style("width", "325px");
 
-  gameTimerLabel = createDiv("Temps de survie : 15s");
+  gameTimerLabel = createDiv("");
   gameTimerLabel.position(timerSlider.x, timerSlider.y - 30);
-  gameTimerLabel.style("font-size", "18px");
-  gameTimerLabel.style("color", "#000");
-  gameTimerLabel.style("font-weight", "bold");
+  gameTimerLabel.style("font-size", "14px");
 }
 
 function startGame() {
-  /* Timeout nécessaire pour éviter que le clique sur le bouton de lancement de jeu 
+  /* Timeout de 100 ms, nécessaire pour éviter que le clique sur le bouton de lancement de jeu 
   soit considéré comme un clique qui dépose une première graine */
   setTimeout(() => {
-    // Nettoyage du canvas
-    dayModeButton.remove();
-    nightModeButton.remove();
-    gameModeLabel.remove();
-    timerSlider.remove();
-    gameTimerLabel.remove();
-    startGameButton.remove();
-
-    // Initialisation du timer
-
+    // Initialisation du timer, tiens compte du mode infini
+    clearInterval(intervalTimer);
     if (timerSlider.value() !== 0) {
       infinityTimer = -1;
       timer = timerSlider.value();
-      setInterval(() => {
+      saveTimer = timer;
+      intervalTimer = setInterval(() => {
         timer--;
       }, 1000);
     } else {
       timer = -1;
       infinityTimer = 0;
-      // On sauvegarde le temps en mode infini pour que le joueur puisse flex ensuite
-      setInterval(() => {
+      intervalTimer = setInterval(() => {
         infinityTimer++;
       }, 1000);
     }
@@ -122,77 +150,143 @@ function startGame() {
     // Initialisation du jeu
     bStartGame = true;
     bGameOver = false;
+    bGamePaused = false;
     humans = [];
     seeds = [];
     marie = new Marie(width / 2, height / 2);
   }, 100);
 }
 
+// à chaque clique/touche, on dépose une graine de taille aléatoire
 function touchStarted() {
-  if (bStartGame) {
+  if (bStartGame && !bGamePaused) {
     seeds.push(new Seed(mouseX, mouseY, Math.floor(Math.random() * 25) + 5));
   }
 }
 
+/* Boucle principale du jeu : Si le jeu n'a pas commencé, on dessine certains éléments 
+et certaines animation de l'accueil. Quand la partie commence, gère le jeu en fonction des paramètres de la partie. */
 function draw() {
-  // le jeu n'a pas start,
   if (!bStartGame) {
-    gameModeLabel.html(
-      isDarkMode ? "Plongeon dans l'obscurité" : "Ballade en journée"
+    drawHomeScreen();
+
+    gameTimerLabel.style("color", isDarkMode ? "#ffffff" : "#000000");
+
+    gameTimerLabel.html(
+      "Arriverez-vous à survivre pendant " +
+        timerSlider.value() +
+        " secondes..."
     );
-    gameTimerLabel.html("Temps de survie : " + timerSlider.value() + "s");
     if (timerSlider.value() === 0) {
-      gameTimerLabel.html("On part sur un temps ∞ !");
+      gameTimerLabel.html("Survivez le plus longtemps possible !");
     }
     return;
   }
 
-  background("#a3b18a");
-  // ajout d'une ombre toutes les 5 secondes
-  if (frameCount % 60 === 0) {
-    // 1 pieds toutes les deux secondes (60 Frames, 30FPS)
-    humans.push(new Human(random(100, width - 100), random(200, height - 150)));
-  }
+  if (bGamePaused) return; // fige la partie
 
-  humans = humans.filter((h) => {
-    h.draw();
-    if (h.diameter > 185) {
-      let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
-      if (touche) {
-        bGameOver = true; // C'est fini
-      }
-    }
-    return h.diameter < 230;
-  });
+  if (!isDarkMode) {
+    background("#a3b18a");
 
-  // fin de partie
-  // TODO : relancer une partie, menu stop ?
-
-  if (timer === 0 || bGameOver) {
-    console.log("fin de partie");
-    console.log("SCORE = ", marie.score);
-    if (!bGameOver) {
-      console.log("Bravo, vous ne vous êtes pas fait écrasé !");
+    fill("black");
+    textSize(24);
+    if (timer === -1) {
+      text("∞", width / 2, height / 24);
     } else {
-      console.log("Dommage, il vous restait " + timer + " secondes à tenir");
-      console.log("hey :", infinityTimer);
+      text(timer, width / 2, height / 24);
     }
-    initGame(); // arrêt via une erreur pour le moment, ça m'arrange
-  }
+    textSize(18);
+    text("SCORE " + marie.score, width / 2, height / 10);
 
-  fill(0, 0, 0);
-  if (timer === -1) {
-    text("infini", 50, 100);
+    if (frameCount % 60 === 0) {
+      humans.push(new Human(random(0, width), random(150, height)));
+    }
+
+    humans = humans.filter((h) => {
+      h.draw();
+      if (h.diameter > 185) {
+        let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
+        if (touche) {
+          bGameOver = true;
+        }
+      }
+      return h.diameter < 230;
+    });
+
+    marie.lookForClosestSeed(seeds);
+    marie.moveTowardTarget();
+
+    seeds.forEach((seed) => seed.draw());
+
+    marie.draw();
+    updateGameSituation();
   } else {
-    text(timer, 50, 100);
+    console.log("DarkMode à implémenter");
   }
-
-  marie.lookForClosestSeed(seeds);
-  marie.moveTowardTarget();
-
-  seeds.forEach((seed) => seed.draw());
-
-  marie.draw();
 }
 
-// TODO : faire un mode nuit
+function updateGameSituation() {
+  if ((timer === -1 && bGameOver) || timer === 0 || bGameOver) {
+    bGamePaused = true;
+    let title, timeMessage, scoreMessage;
+    if (timer >= 0) {
+      title = bGameOver
+        ? "Dommage, vous avez été écrasé..."
+        : "Félicitations, vous avez réussi !";
+      timeMessage =
+        "Vous avez survécu pendant " + str(saveTimer - timer) + " secondes.";
+    } else {
+      title = "C'est terminé !";
+      timeMessage = "Vous avez survécu pendant " + infinityTimer + " secondes.";
+    }
+    scoreMessage = "Votre score: " + marie.score;
+    drawEndGamePopUp(title, timeMessage, scoreMessage);
+  }
+}
+
+function drawEndGamePopUp(title, timeMessage, scoreMessage) {
+  endGamePopup = createDiv(
+    "<h3>" +
+      title +
+      "</h3><p>" +
+      timeMessage +
+      "</p><p>" +
+      scoreMessage +
+      "</p>"
+  );
+
+  endGamePopup.style("padding", "15px");
+  endGamePopup.style("background-color", isDarkMode ? "#34495e" : "#ecf0f1");
+  endGamePopup.style("color", isDarkMode ? "#ecf0f1" : "#34495e");
+  endGamePopup.style("position", "absolute");
+  endGamePopup.style("top", "50%");
+  endGamePopup.style("left", "50%");
+  endGamePopup.style("transform", "translate(-50%, -50%)");
+  endGamePopup.style("text-align", "center");
+  endGamePopup.style("width", "500px");
+
+  let newGameButton = createButton("Nouvelle partie");
+  newGameButton.parent(endGamePopup);
+  newGameButton.mousePressed(resetGame);
+
+  let restartButton = createButton("Rejouer le niveau");
+  restartButton.parent(endGamePopup);
+  restartButton.mousePressed(replayGame);
+}
+
+function replayGame() {
+  if (endGamePopup) endGamePopup.remove();
+
+  startGame();
+}
+
+function resetGame() {
+  timer = timerSlider.value();
+  infinityTimer = 0;
+
+  bStartGame = false;
+
+  if (endGamePopup) endGamePopup.remove();
+
+  setup();
+}

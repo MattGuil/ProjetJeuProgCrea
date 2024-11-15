@@ -1,9 +1,10 @@
+// TODO : habillage
 class Human {
   constructor(pX, pY) {
     this.x = pX;
     this.y = pY;
     this.diameter = 20;
-    this.figure = random(0, 2); // TODO : ajuster pour avoir le pied, une main, ou autre forme...
+    this.figure = random(0, 2);
   }
 
   draw() {
