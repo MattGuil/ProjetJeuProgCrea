@@ -11,6 +11,9 @@ class Marie {
     this.score = 0;
     this.isEating = false;
     this.progressbar = null;
+
+    // Angle actuel de direction, par défaut vers le haut (0 radians)
+    this.currentAngle = 0;
   }
 
   lookForClosestSeed(seeds) {
@@ -71,12 +74,16 @@ class Marie {
 
       this.coordinate.x += directionX * this.speed;
       this.coordinate.y += directionY * this.speed;
+
+      // Met à jour l'angle actuel de déplacement
+      this.currentAngle = atan2(dy, dx);
     }
   }
 
   eatSeed() {
     this.isEating = true;
     this.progressbar = new ProgressBar(this.target.value);
+    // Conserve l'angle actuel après avoir mangé une graine
   }
 
   draw() {
@@ -86,7 +93,18 @@ class Marie {
     } else {
       // Utilisation du mode gomme pour dessiner la vision de Marie en mode nuit
       this.darkLayer.erase();
-      this.darkLayer.circle(marie.coordinate.x, marie.coordinate.y, 150);
+      this.darkLayer.fill(255, 0, 255);
+      this.darkLayer.circle(marie.coordinate.x, marie.coordinate.y, 80);
+
+      let angle = this.currentAngle; // Utilise l'angle actuel
+
+      this.darkLayer.push();
+      this.darkLayer.translate(this.coordinate.x, this.coordinate.y);
+      this.darkLayer.rotate(angle);
+      this.darkLayer.circle(40, 0, 100);
+      this.darkLayer.circle(70, 0, 115);
+      this.darkLayer.pop();
+
       this.darkLayer.noErase();
 
       this.darkLayer.fill(255, 0, 0);

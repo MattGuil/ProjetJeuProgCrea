@@ -22,6 +22,7 @@ let endGamePopUp;
 
 // Ajout d'un plan pour le mode nuit
 let nightCanvas;
+let predator;
 
 /* Fonction qui sert de point d'entrée du jeu. On définit certains paramètres 
 et on dessine une première fois l'accueil.Tout ce qui est impacté par un changement 
@@ -153,6 +154,8 @@ function startGame() {
     humans = [];
     seeds = [];
     marie = new Marie(width / 2, height / 2, isNightMode ? nightCanvas : null);
+
+    if (isNightMode) predator = new Predator(width / 8, height / 8);
   }, 100);
 }
 
@@ -160,14 +163,37 @@ function startGame() {
 function touchStarted() {
   if (bStartGame && !bGamePaused) {
     let seed = new Seed(mouseX, mouseY, Math.floor(Math.random() * 25) + 5);
+
     if (isNightMode) {
-      let distanceMarieSeed = dist(
+      /* Mode nuit, on ne peut poserles graines que dans le champ de vision de Marie 
+      distance entre la touche (graine) et marie */
+      let distanceToMarie = dist(
         marie.coordinate.x,
         marie.coordinate.y,
         mouseX,
         mouseY
       );
-      if (distanceMarieSeed < 75) {
+
+      // On définit aussi un angle pour les deux autres cercles qui font office de vision de l'insecte
+      let angleToMouse = atan2(
+        mouseY - marie.coordinate.y,
+        mouseX - marie.coordinate.x
+      );
+
+      let angleDiff = abs(angleToMouse - marie.currentAngle);
+      if (angleDiff > PI) angleDiff = TWO_PI - angleDiff;
+
+      /* Triple vérification : premier cercle, second cercle et dernier cercle de vision
+      très approximatif */
+      if (
+        distanceToMarie < 40 ||
+        (distanceToMarie >= 40 &&
+          distanceToMarie <= 100 &&
+          angleDiff < radians(60)) ||
+        (distanceToMarie > 100 &&
+          distanceToMarie <= 125 &&
+          angleDiff < radians(30))
+      ) {
         seeds.push(seed);
       }
     } else {
@@ -284,21 +310,33 @@ function draw() {
 
   background("#a3b18a");
 
-  // On génère une ombre d'ennemi toutes les 30 frames
-  if (frameCount % 30 === 0) {
-    humans.push(new Human(random(0, width), random(150, height), isNightMode));
-  }
-
-  humans = humans.filter((h) => {
-    h.draw();
-    if (h.diameter > 150) {
-      let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
-      if (touche) {
-        bGameOver = true;
-      }
+  if (!isNightMode) {
+    // On génère une ombre d'ennemi toutes les 30 frames
+    if (frameCount % 30 === 0) {
+      humans.push(
+        new Human(random(0, width), random(150, height), isNightMode)
+      );
     }
-    return h.diameter < 190;
-  });
+
+    humans = humans.filter((h) => {
+      h.draw();
+      if (h.diameter > 150) {
+        let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
+        if (touche) {
+          bGameOver = true;
+        }
+      }
+      return h.diameter < 190;
+    });
+  } else {
+    predator.draw();
+    //predator.move();
+
+    // Vérifier si Marie est détectée par le crapaud
+    if (predator.detectInsect(marie.coordinate.x, marie.coordinate.y)) {
+      bGameOver = true;
+    }
+  }
 
   seeds.forEach((seed) => seed.draw());
 
