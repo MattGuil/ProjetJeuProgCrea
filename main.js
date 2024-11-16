@@ -22,7 +22,7 @@ let endGamePopUp;
 
 // Ajout d'un plan pour le mode nuit
 let nightCanvas;
-let predator;
+let predators;
 
 /* Fonction qui sert de point d'entrée du jeu. On définit certains paramètres 
 et on dessine une première fois l'accueil.Tout ce qui est impacté par un changement 
@@ -153,9 +153,10 @@ function startGame() {
     bGamePaused = false;
     humans = [];
     seeds = [];
+    predators = [];
     marie = new Marie(width / 2, height / 2, isNightMode ? nightCanvas : null);
 
-    if (isNightMode) predator = new Predator(width / 8, height / 8);
+    if (isNightMode) predators.push(new Predator(width / 8, height / 8));
   }, 100);
 }
 
@@ -329,12 +330,25 @@ function draw() {
       return h.diameter < 190;
     });
   } else {
-    predator.draw();
-    //predator.move();
+    predators.forEach((p) => {
+      p.draw();
+      //p.move();
+      // Vérifier si Marie est détectée par le crapaud
+      if (p.detectInsect(marie.coordinate.x, marie.coordinate.y))
+        bGameOver = true;
+    });
 
-    // Vérifier si Marie est détectée par le crapaud
-    if (predator.detectInsect(marie.coordinate.x, marie.coordinate.y)) {
-      bGameOver = true;
+    // mode infini, ajout d'un predator toutes les 60 secondes (1800 frames) jusqu'à ce qu'il y ait 4 predateurs sur le terrain
+    if (timer === -1 && frameCount % 1800 === 0 && predators.length < 4) {
+      predators.push(new Predator(width / 8, height / 8));
+    }
+    // mode temps limité, ajout d'un predator toutes les 80 secondes (2400 frames), max 3 predateurs sur le terrain
+    if (
+      infinityTimer === -1 &&
+      frameCount % 2400 === 0 &&
+      predators.length < 3
+    ) {
+      predators.push(new Predator(width / 8, height / 8));
     }
   }
 
