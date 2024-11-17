@@ -13,7 +13,7 @@ canvas {
   display: block;
 }
 
-div.infosPopUp {
+div.endGamePopUp, div.infosPopUp {
   padding: 15px;
   position: absolute;
   top: 50%;
@@ -21,10 +21,22 @@ div.infosPopUp {
   transform: translate(-50%, -50%);
   width: 500px;
   border-radius: 10px;
+}
 
-  div.ok {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-  }
+div.endGamePopUp {
+  text-align: center;
+}
+
+div.infosPopUp div.ok {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+div.endGamePopUp .newGameButton {
+  margin-right: 10px;
+}
+
+div.endGamePopUp .replayButton {
+  margin-left: 10px;
 }

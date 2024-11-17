@@ -25,14 +25,17 @@ let infosPopUp;
 let nightCanvas;
 let predators;
 
-let humanHand, humanFoot;
+let antImg, seedImg, toadImg, humanHand, humanFoot;
 
 let font;
 
 function preload() {
+  font = loadFont("fonts/SourGummy-VariableFont_wdth,wght.ttf");
+
+  antImg = loadImage("assets/ant-50x50.png");
+  toadImg = loadImage("assets/toad.png");
   humanHand = loadImage("assets/humanHand.png");
   humanFoot = loadImage("assets/humanFoot.png");
-  font = loadFont("fonts/SourGummy-VariableFont_wdth,wght.ttf");
 }
 
 /* Fonction qui sert de point d'entrée du jeu. On définit certains paramètres 
@@ -285,24 +288,18 @@ function drawEndGamePopUp(title, timeMessage, scoreMessage) {
       "</p>"
   );
 
-  endGamePopUp.style("padding", "15px");
   endGamePopUp.style("background-color", isNightMode ? "#34495e" : "#ecf0f1");
   endGamePopUp.style("color", isNightMode ? "#ecf0f1" : "#34495e");
-  endGamePopUp.style("position", "absolute");
-  endGamePopUp.style("top", "50%");
-  endGamePopUp.style("left", "50%");
-  endGamePopUp.style("transform", "translate(-50%, -50%)");
-  endGamePopUp.style("text-align", "center");
-  endGamePopUp.style("width", "500px");
+  endGamePopUp.addClass("endGamePopUp");
 
   let newGameButton = createButton("Nouvelle partie");
-  newGameButton.style("margin-right", "15px");
+  newGameButton.addClass("newGameButton");
   newGameButton.parent(endGamePopUp);
   newGameButton.mousePressed(newGame);
 
   let restartButton = createButton("Rejouer le niveau");
+  newGameButton.addClass("replayButton");
   restartButton.parent(endGamePopUp);
-  restartButton.style("margin-left", "15px");
   restartButton.mousePressed(replayGame);
 }
 
@@ -374,7 +371,7 @@ function draw() {
     });
   } else {
     predators.forEach((p) => {
-      p.draw();
+      p.draw(toadImg);
       p.move();
       // Vérifier si Marie est détectée par le crapaud
       if (p.detectInsect(marie.coordinate.x, marie.coordinate.y))
@@ -403,7 +400,11 @@ function draw() {
     nightCanvas.rect(0, 0, width, height);
   }
 
-  marie.draw();
+  if (marie.target && marie.coordinate.x < marie.target.coordinate.x) {
+    marie.draw(antImg, "toTheRight");
+  } else {
+    marie.draw(antImg, "toTheLeft");
+  }
 
   if (isNightMode) image(nightCanvas, 0, 0);
 

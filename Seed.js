@@ -7,8 +7,8 @@ class Seed {
     this.value = value;
   }
 
-  draw() {
-    fill("white");
+  draw(img) {
+    fill("yellow");
     circle(this.coordinate.x, this.coordinate.y, this.value);
   }
 }

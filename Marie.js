@@ -86,10 +86,18 @@ class Marie {
     // Conserve l'angle actuel après avoir mangé une graine
   }
 
-  draw() {
+  draw(img, direction) {
     if (this.darkLayer === null) {
-      fill(255, 0, 0);
-      circle(this.coordinate.x, this.coordinate.y, 25);
+      // fill(255, 0, 0);
+      // circle(this.coordinate.x, this.coordinate.y, 25);
+      if (direction == "toTheLeft") {
+        image(img, this.coordinate.x - img.width / 2, this.coordinate.y - img.height / 2);
+      } else {
+        push();
+        scale(-1, 1);
+        image(img, -this.coordinate.x - img.width / 2, this.coordinate.y - img.height / 2);
+        pop();
+      }
     } else {
       // Utilisation du mode gomme pour dessiner la vision de Marie en mode nuit
       this.darkLayer.erase();
@@ -108,7 +116,15 @@ class Marie {
       this.darkLayer.noErase();
 
       this.darkLayer.fill(255, 0, 0);
-      this.darkLayer.circle(this.coordinate.x, this.coordinate.y, 25);
+      // this.darkLayer.circle(this.coordinate.x, this.coordinate.y, 25);
+      if (direction == "toTheLeft") {
+        this.darkLayer.image(img, this.coordinate.x - img.width / 2, this.coordinate.y - img.height / 2);
+      } else {
+        this.darkLayer.push();
+        this.darkLayer.scale(-1, 1);
+        this.darkLayer.image(img, -this.coordinate.x - img.width / 2, this.coordinate.y - img.height / 2);
+        this.darkLayer.pop();
+      }
     }
   }
 }
