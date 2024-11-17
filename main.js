@@ -19,18 +19,30 @@ let timerSlider, gameTimerLabel;
 let startGameButton;
 let infoButton;
 let endGamePopUp;
+let infosPopUp;
 
 // Ajout d'un plan pour le mode nuit
 let nightCanvas;
 let predators;
 
+let humanHand, humanFoot;
+
+let font;
+
+function preload() {
+  humanHand = loadImage("assets/humanHand.png");
+  humanFoot = loadImage("assets/humanFoot.png");
+  font = loadFont("fonts/SourGummy-VariableFont_wdth,wght.ttf");
+}
+
 /* Fonction qui sert de point d'entrée du jeu. On définit certains paramètres 
-et on dessine une première fois l'accueil.Tout ce qui est impacté par un changement 
+et on dessine une première fois l'accueil. Tout ce qui est impacté par un changement
 lié à une interaction/animation est dessiné dans draw() directement */
 function setup() {
   frameRate(30); // 30 FPS
   createCanvas(windowWidth, windowHeight);
   noStroke();
+  textFont(font);
 
   nightCanvas = createGraphics(windowWidth, windowHeight);
   nightCanvas.noStroke();
@@ -42,15 +54,7 @@ function setup() {
   startGameButton.size(100, 40);
   startGameButton.position(width / 2 - 50, timerSlider.y + 50);
   startGameButton.mousePressed(() => {
-    // Nettoyage du canvas avec l'accueil et lancement du jeu
-    dayModeButton.remove();
-    nightModeButton.remove();
-    infoButton.remove();
-    timerSlider.remove();
-    gameTimerLabel.remove();
-    startGameButton.remove();
-
-    startGame();
+    runGame()
   });
 
   infoButton = createButton("?");
@@ -62,15 +66,49 @@ function setup() {
   // interaction clavier avec la touche ENTER pour lancer la partie
   keyPressed = () => {
     if (keyCode === ENTER) {
-      startGame();
+      runGame();
     }
   };
 }
 
+function runGame() {
+  // Nettoyage du canvas avec l'accueil et lancement du jeu
+  dayModeButton.remove();
+  nightModeButton.remove();
+  infoButton.remove();
+  timerSlider.remove();
+  gameTimerLabel.remove();
+  startGameButton.remove();
+
+  startGame();
+}
+
 function showInformationsPopUp() {
-  alert(
-    "Le saviez-vous ? \nIl s'agit d'un projet étudiant du M2 CIM (DT), développé par Matthieu Guillemin et Guillaume Hostache. \nOn remercie les livres \"Drôles de petites bêtes\" pour l'inspiration :)"
+  infosPopUp = createDiv(
+      "<h3>Règles du jeu</h3>" +
+      "<p>Votre objectif est de permettre à <em>Marie la fourmi</em> de survivre le plus longtemps possible dans ce monde trop hostile pour une bestiole de son gabarit.</p>" +
+      "<p>De jour ou de nuit, soyez attentifs !</p>" +
+      "<p>De jour : À intervalle de temps variable, l’ombre du pied (ou de la main) d’un humain malveillant apparaît à l’écran et indique alors au joueur la zone à fuir au plus vite. Si la fourmi se trouve sous le pied (ou la main) de l’humain au moment où il (ou elle) touche le sol, c’est la mort assurée.</p>" +
+      "<p>De nuit : Un crapaud tapi dans la pénombre attend que la fourmi entre dans son champ de vision pour la manger. Avancez à tatons pour localiser le danger et faire grimper votre score.</p>" +
+      "<h3>Crédits</h3>" +
+      "<p><strong>Insecte-qui-peut!</strong> est un projet étudiant du M2 CIM (DT), développé par <strong>Matthieu Guillemin</strong> et <strong>Guillaume Hostache</strong>. \nOn remercie les livres \"Drôles de petites bêtes\" pour l'inspiration :)</p>"
   );
+
+  infosPopUp.style("background-color", isNightMode ? "#34495e" : "#ecf0f1");
+  infosPopUp.style("color", isNightMode ? "#ecf0f1" : "#34495e");
+  infosPopUp.addClass('infosPopUp');
+
+  let okDiv = createDiv();
+  okDiv.addClass("ok");
+
+  okDiv.parent(infosPopUp);
+  let okButton = createButton("OK");
+  okButton.parent(okDiv);
+  okButton.mousePressed(removeInfosPopUp);
+}
+
+function removeInfosPopUp() {
+  if (infosPopUp) infosPopUp.remove();
 }
 
 function drawHomeScreen() {
@@ -88,20 +126,20 @@ function drawHomeScreen() {
 
 function drawGameModeSelection() {
   dayModeButton = createButton("Jour");
-  dayModeButton.size(100, 40);
+  dayModeButton.size(150, 40);
   dayModeButton.mousePressed(() => {
     isNightMode = false;
     updateButtonStyles();
   });
-  dayModeButton.position(width / 2 - 110, height / 3);
+  dayModeButton.position(width / 2 - 150, height / 3);
 
   nightModeButton = createButton("Nuit");
-  nightModeButton.size(100, 40);
+  nightModeButton.size(150, 40);
   nightModeButton.mousePressed(() => {
     isNightMode = true;
     updateButtonStyles();
   });
-  nightModeButton.position(width / 2 + 10, height / 3);
+  nightModeButton.position(width / 2 + 20, height / 3);
 
   updateButtonStyles();
 }
@@ -223,7 +261,7 @@ function updateGameSituation() {
     let title, timeMessage, scoreMessage;
     if (timer >= 0) {
       title = bGameOver
-        ? "Dommage, vous avez été écrasé..."
+        ? "Dommage, vous avez perdu..."
         : "Félicitations, vous avez réussi !";
       timeMessage =
         "Vous avez survécu pendant " + str(saveTimer - timer) + " secondes.";
@@ -258,11 +296,13 @@ function drawEndGamePopUp(title, timeMessage, scoreMessage) {
   endGamePopUp.style("width", "500px");
 
   let newGameButton = createButton("Nouvelle partie");
+  newGameButton.style("margin-right", "15px");
   newGameButton.parent(endGamePopUp);
   newGameButton.mousePressed(newGame);
 
   let restartButton = createButton("Rejouer le niveau");
   restartButton.parent(endGamePopUp);
+  restartButton.style("margin-left", "15px");
   restartButton.mousePressed(replayGame);
 }
 
@@ -314,25 +354,28 @@ function draw() {
   if (!isNightMode) {
     // On génère une ombre d'ennemi toutes les 30 frames
     if (frameCount % 30 === 0) {
+      let alea = Math.random();
       humans.push(
-        new Human(random(0, width), random(150, height), isNightMode)
+        new Human(random(0, width), random(150, height), alea > 0.5 ? humanFoot : humanHand, isNightMode)
       );
     }
 
+    // TODO après test, modifier la vitesse des ombres ?
+
     humans = humans.filter((h) => {
       h.draw();
-      if (h.diameter > 150) {
+      if (h.sx > 160) {
         let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
         if (touche) {
           bGameOver = true;
         }
       }
-      return h.diameter < 190;
+      return h.sx < 220;
     });
   } else {
     predators.forEach((p) => {
       p.draw();
-      //p.move();
+      p.move();
       // Vérifier si Marie est détectée par le crapaud
       if (p.detectInsect(marie.coordinate.x, marie.coordinate.y))
         bGameOver = true;

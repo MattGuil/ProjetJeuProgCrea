@@ -1,26 +1,29 @@
-// TODO : habillage
 class Human {
-  constructor(pX, pY, pDarkMode) {
+  constructor(pX, pY, pFrame, pDarkMode) {
     this.x = pX;
     this.y = pY;
+    this.frame = pFrame;
     this.isDarkMode = pDarkMode;
-    this.diameter = 20;
+    this.sx = 5;
+    this.sy = 5;
   }
 
   draw() {
-    fill(0, 255, 255);
-    circle(this.x, this.y, this.diameter);
-    this.diameter += this.isDarkMode ? 1 : 3;
+    translate(- this.sx / 2, - this.sy / 2);
+    image(this.frame, this.x, this.y, this.sx, this.sy);
+    translate(this.sx / 2, this.sy / 2);
+
+    this.sx++;
+    this.sy++;
   }
 
   detectInsect(insectX, insectY) {
-    // Calcul de la distance entre l'insecte et l'ennemi
-    let distX = insectX - this.x;
-    let distY = insectY - this.y;
-    let distance = Math.sqrt(distX * distX + distY * distY);
+    let left = this.x - this.sx / 2;
+    let right = this.x + this.sx / 2;
+    let top = this.y - this.sy / 2;
+    let bottom = this.y + this.sy / 2;
 
-    // test collision
-    if (distance <= this.diameter / 2) {
+    if (insectX >= left && insectX <= right && insectY >= top && insectY <= bottom) {
       return true;
     }
     return false;
