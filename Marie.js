@@ -1,9 +1,10 @@
 class Marie {
-  constructor(posX, posY, pDarkLayer) {
+  constructor(frame, posX, posY, pDarkLayer) {
     this.coordinate = {
       x: posX,
       y: posY,
     };
+    this.frame = frame;
     this.darkLayer = pDarkLayer;
     this.speed = this.darkLayer ? 3 : 6;
     this.target = null;
@@ -14,6 +15,15 @@ class Marie {
 
     // Angle actuel de direction, par défaut vers le haut (0 radians)
     this.currentAngle = 0;
+  }
+
+  leakInPanic(seeds) {
+    // Fuite en panique face à un ennemi/crapaud en approche
+    this.isEating = false;
+    this.progressbar = null;
+    seeds.splice(this.targetIndex, 1);
+    this.targetIndex = -1;
+    this.target = null;
   }
 
   lookForClosestSeed(seeds) {
@@ -86,16 +96,14 @@ class Marie {
     // Conserve l'angle actuel après avoir mangé une graine
   }
 
-  draw(img, direction) {
+  draw(direction) {
     if (this.darkLayer === null) {
-      // fill(255, 0, 0);
-      // circle(this.coordinate.x, this.coordinate.y, 25);
-      if (direction == "toTheLeft") {
-        image(img, this.coordinate.x - img.width / 2, this.coordinate.y - img.height / 2);
+      if (direction === "toTheLeft") {
+        image(this.frame, this.coordinate.x - this.frame.width / 2, this.coordinate.y - this.frame.height / 2);
       } else {
         push();
         scale(-1, 1);
-        image(img, -this.coordinate.x - img.width / 2, this.coordinate.y - img.height / 2);
+        image(this.frame, -this.coordinate.x - this.frame.width / 2, this.coordinate.y - this.frame.height / 2);
         pop();
       }
     } else {
@@ -117,14 +125,15 @@ class Marie {
 
       this.darkLayer.fill(255, 0, 0);
       // this.darkLayer.circle(this.coordinate.x, this.coordinate.y, 25);
-      if (direction == "toTheLeft") {
-        this.darkLayer.image(img, this.coordinate.x - img.width / 2, this.coordinate.y - img.height / 2);
+      if (direction === "toTheLeft") {
+        this.darkLayer.image(this.frame, this.coordinate.x - this.frame.width / 2, this.coordinate.y - this.frame.height / 2);
       } else {
         this.darkLayer.push();
         this.darkLayer.scale(-1, 1);
-        this.darkLayer.image(img, -this.coordinate.x - img.width / 2, this.coordinate.y - img.height / 2);
+        this.darkLayer.image(this.frame, -this.coordinate.x - this.frame.width / 2, this.coordinate.y - this.frame.height / 2);
         this.darkLayer.pop();
       }
     }
   }
+
 }

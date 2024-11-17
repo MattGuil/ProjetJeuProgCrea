@@ -25,23 +25,36 @@ let infosPopUp;
 let nightCanvas;
 let predators;
 
+let font;
+let dayBackground;
 let antImg, seedImg, toadImg, humanHand, humanFoot;
 
-let font;
+let horrorMusic, summerNightAmbiance;
 
 function preload() {
   font = loadFont("fonts/SourGummy-VariableFont_wdth,wght.ttf");
 
+  dayBackground = loadImage("assets/dayBackground.png");
+  nightBackground = loadImage("assets/nightBackground.png");
+
   antImg = loadImage("assets/ant-50x50.png");
+  seedImg = loadImage("assets/seed.png");
+  console.log(seedImg);
   toadImg = loadImage("assets/toad.png");
   humanHand = loadImage("assets/humanHand.png");
   humanFoot = loadImage("assets/humanFoot.png");
+
+  horrorMusic = loadSound("sounds/horror-music.mp3");
+  summerNightAmbiance = loadSound("sounds/summer-night-ambiance.mp3");
 }
 
 /* Fonction qui sert de point d'entrée du jeu. On définit certains paramètres 
 et on dessine une première fois l'accueil. Tout ce qui est impacté par un changement
 lié à une interaction/animation est dessiné dans draw() directement */
 function setup() {
+  summerNightAmbiance.stop();
+  horrorMusic.stop();
+
   frameRate(30); // 30 FPS
   createCanvas(windowWidth, windowHeight);
   noStroke();
@@ -54,24 +67,35 @@ function setup() {
   drawGameTimeSelection();
 
   startGameButton = createButton("Jouer");
-  startGameButton.size(100, 40);
-  startGameButton.position(width / 2 - 50, timerSlider.y + 50);
+  startGameButton.size(150, 60);
+  startGameButton.position(width / 2, timerSlider.y + 50);
   startGameButton.mousePressed(() => {
     runGame()
   });
 
   infoButton = createButton("?");
   infoButton.size(width / 16, width / 16);
-  infoButton.position(width - width / 14, height / 24);
+  infoButton.position(width - width / 14, height / 32);
   infoButton.style("border-radius", "100px");
   infoButton.mousePressed(showInformationsPopUp);
+}
 
+function keyPressed() {
   // interaction clavier avec la touche ENTER pour lancer la partie
-  keyPressed = () => {
-    if (keyCode === ENTER) {
-      runGame();
-    }
-  };
+  if (!bStartGame && keyCode === ENTER) {
+    runGame();
+  }
+
+  /* interaction clavier avec la touche ESPACE pour permettre au joueur
+  d'abandonner la graine courante pour un déplacement en urgence vers une autre graine (fuite) */
+  if (bStartGame && marie != null && seeds != null && keyCode === 32) {
+    marie.leakInPanic(seeds);
+  }
+
+  // Quitter le jeu en appuyant sur echap
+  if (bStartGame && keyCode === ESCAPE) {
+    newGame();
+  }
 }
 
 function runGame() {
@@ -118,31 +142,31 @@ function drawHomeScreen() {
   background(isNightMode ? "#2c3e50" : "#a7c957");
 
   fill(isNightMode ? "#bdc3c7" : "#386641");
-  circle(width / 42, height + height / 8, width / 4);
-  circle(width, 0, width / 4);
+  circle(0, height, width / 4);
+  circle(width, 0, width /4);
 
   fill(isNightMode ? "#ffffff" : "#000000");
   textAlign(CENTER, CENTER);
-  textSize(42);
+  textSize(64);
   text("Insecte-qui-peut !", width / 2, height / 6);
 }
 
 function drawGameModeSelection() {
   dayModeButton = createButton("Jour");
-  dayModeButton.size(150, 40);
+  dayModeButton.size(150, 60);
   dayModeButton.mousePressed(() => {
     isNightMode = false;
     updateButtonStyles();
   });
-  dayModeButton.position(width / 2 - 150, height / 3);
+  dayModeButton.position(width / 2 - 160, height / 3);
 
   nightModeButton = createButton("Nuit");
-  nightModeButton.size(150, 40);
+  nightModeButton.size(150, 60);
   nightModeButton.mousePressed(() => {
     isNightMode = true;
     updateButtonStyles();
   });
-  nightModeButton.position(width / 2 + 20, height / 3);
+  nightModeButton.position(width / 2 + 10, height / 3);
 
   updateButtonStyles();
 }
@@ -160,11 +184,11 @@ function updateButtonStyles() {
 function drawGameTimeSelection() {
   timerSlider = createSlider(0, 300, timer);
   timerSlider.position(windowWidth / 2 - 162.5, height / 2 + height / 12);
-  timerSlider.style("width", "325px");
+  timerSlider.style("width", "350px");
 
   gameTimerLabel = createDiv("");
   gameTimerLabel.position(timerSlider.x, timerSlider.y - 30);
-  gameTimerLabel.style("font-size", "14px");
+  gameTimerLabel.style("font-size", "16px");
 }
 
 function startGame() {
@@ -195,16 +219,22 @@ function startGame() {
     humans = [];
     seeds = [];
     predators = [];
-    marie = new Marie(width / 2, height / 2, isNightMode ? nightCanvas : null);
+    marie = new Marie(antImg, width / 2, height / 2, isNightMode ? nightCanvas : null);
 
-    if (isNightMode) predators.push(new Predator(width / 8, height / 8));
+    if (isNightMode) {
+      summerNightAmbiance.amp(0.1);
+      horrorMusic.amp(0.1);
+      summerNightAmbiance.loop();
+      horrorMusic.loop();
+      predators.push(new Predator(width / 8, height / 8));
+    }
   }, 100);
 }
 
 // à chaque clique/touche, on dépose une graine de taille aléatoire
 function touchStarted() {
   if (bStartGame && !bGamePaused) {
-    let seed = new Seed(mouseX, mouseY, Math.floor(Math.random() * 25) + 5);
+    let seed = new Seed(mouseX, mouseY, Math.floor(Math.random() * 35) + 15, seedImg);
 
     if (isNightMode) {
       /* Mode nuit, on ne peut poserles graines que dans le champ de vision de Marie 
@@ -333,9 +363,9 @@ function draw() {
     gameTimerLabel.style("color", isNightMode ? "#ffffff" : "#000000");
 
     gameTimerLabel.html(
-      "Arriverez-vous à survivre pendant " +
+      'Arriverez-vous à survivre pendant <strong>' +
         timerSlider.value() +
-        " secondes..."
+        '</strong> secondes...'
     );
 
     if (timerSlider.value() === 0) {
@@ -346,9 +376,15 @@ function draw() {
 
   if (bGamePaused) return; // On fige la partie -> utile pour les fins de partie
 
-  background("#a3b18a");
-
   if (!isNightMode) {
+    background("white");
+    let x, y;
+    for (x = 0; x <= width; x += dayBackground.width) {
+      for (y = 0; y <= height; y += dayBackground.height) {
+        image(dayBackground, x, y);
+      }
+    }
+
     // On génère une ombre d'ennemi toutes les 30 frames
     if (frameCount % 30 === 0) {
       let alea = Math.random();
@@ -356,8 +392,6 @@ function draw() {
         new Human(random(0, width), random(150, height), alea > 0.5 ? humanFoot : humanHand, isNightMode)
       );
     }
-
-    // TODO après test, modifier la vitesse des ombres ?
 
     humans = humans.filter((h) => {
       h.draw();
@@ -370,6 +404,14 @@ function draw() {
       return h.sx < 220;
     });
   } else {
+    background("black");
+    let x, y;
+    for (x = 0; x <= width; x += nightBackground.width) {
+      for (y = 0; y <= height; y += nightBackground.height) {
+        image(nightBackground, x, y);
+      }
+    }
+
     predators.forEach((p) => {
       p.draw(toadImg);
       p.move();
@@ -401,9 +443,9 @@ function draw() {
   }
 
   if (marie.target && marie.coordinate.x < marie.target.coordinate.x) {
-    marie.draw(antImg, "toTheRight");
+    marie.draw("toTheRight");
   } else {
-    marie.draw(antImg, "toTheLeft");
+    marie.draw("toTheLeft");
   }
 
   if (isNightMode) image(nightCanvas, 0, 0);

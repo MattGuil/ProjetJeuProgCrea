@@ -4,21 +4,19 @@ class Predator {
       x: posX,
       y: posY,
     };
-    this.vision = 60;
+    this.vision = 120;
     this.size = 40;
     this.speed = 2;
     this.direction = createVector(random(-1, 1), random(-1, 1)).normalize();
   }
 
   draw(img) {
-    // Halo sombre semi-transparent
+    // vision représenté par un cercle at
     fill(0, 0, 0, 150);
     ellipse(this.coordinate.x, this.coordinate.y, this.vision * 2);
 
-    // notre grenouille
-    // fill(34, 139, 34);
-    // ellipse(this.coordinate.x, this.coordinate.y, this.size);
-    image(img, this.coordinate.x - img.width / 2, this.coordinate.y / img.width / 2);
+    // image de notre crapaud
+    image(img, this.coordinate.x - img.width / 2, this.coordinate.y - img.width / 2);
   }
 
   detectInsect(insectX, insectY) {
