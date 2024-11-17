@@ -26,12 +26,12 @@ let nightCanvas;
 let predators;
 
 let font;
-let dayBackground;
+let dayBackground, nightBackground;
 let antImg, seedImg, toadImg, humanHand, humanFoot;
-
 let horrorMusic, summerNightAmbiance;
 
 function preload() {
+  // chargement des images, sons, police...
   font = loadFont("fonts/SourGummy-VariableFont_wdth,wght.ttf");
 
   dayBackground = loadImage("assets/dayBackground.png");
@@ -39,7 +39,6 @@ function preload() {
 
   antImg = loadImage("assets/ant-50x50.png");
   seedImg = loadImage("assets/seed.png");
-  console.log(seedImg);
   toadImg = loadImage("assets/toad.png");
   humanHand = loadImage("assets/humanHand.png");
   humanFoot = loadImage("assets/humanFoot.png");
@@ -68,9 +67,12 @@ function setup() {
 
   startGameButton = createButton("Jouer");
   startGameButton.size(150, 60);
-  startGameButton.position(width / 2, timerSlider.y + 50);
+  startGameButton.position(
+    width / 2 - startGameButton.width / 2,
+    timerSlider.y + 100
+  );
   startGameButton.mousePressed(() => {
-    runGame()
+    runGame();
   });
 
   infoButton = createButton("?");
@@ -80,22 +82,39 @@ function setup() {
   infoButton.mousePressed(showInformationsPopUp);
 }
 
-function keyPressed() {
-  // interaction clavier avec la touche ENTER pour lancer la partie
-  if (!bStartGame && keyCode === ENTER) {
-    runGame();
+function drawAntFoot() {
+  let oscAmplitude = 380; // Amplitude de l'oscillation de base
+  let oscFrequency = 0.015; // Fréquence de l'oscillation
+  let noiseAmplitude = 0.2; // Amplitude du bruit ajouté à la courbe
+  let noiseFrequency = 0.02; // Fréquence du bruit ajouté
+
+  let y = 0; // position initiale
+  let step = 5; // distance entre les points
+  let noiseOffset = random(1000); // Point de départ aléatoire pour le bruit
+
+  beginShape();
+  while (y <= height) {
+    let oscillation = sin(y * oscFrequency) * oscAmplitude;
+
+    let noiseOffsetX = map(
+      noise(noiseOffset),
+      0,
+      1,
+      -noiseAmplitude,
+      noiseAmplitude
+    );
+
+    let progress = map(y, 0, height, 0, 1);
+    let transitionX = lerp(width / 4, (3 * width) / 4, progress);
+    let currentX = transitionX + oscillation + noiseOffsetX;
+
+    fill(isNightMode ? "#bdc3c7" : "#386641");
+    circle(currentX, y, 5);
+    noiseOffset += noiseFrequency;
+    y += step;
   }
 
-  /* interaction clavier avec la touche ESPACE pour permettre au joueur
-  d'abandonner la graine courante pour un déplacement en urgence vers une autre graine (fuite) */
-  if (bStartGame && marie != null && seeds != null && keyCode === 32) {
-    marie.leakInPanic(seeds);
-  }
-
-  // Quitter le jeu en appuyant sur echap
-  if (bStartGame && keyCode === ESCAPE) {
-    newGame();
-  }
+  endShape();
 }
 
 function runGame() {
@@ -112,18 +131,19 @@ function runGame() {
 
 function showInformationsPopUp() {
   infosPopUp = createDiv(
-      "<h3>Règles du jeu</h3>" +
-      "<p>Votre objectif est de permettre à <em>Marie la fourmi</em> de survivre le plus longtemps possible dans ce monde trop hostile pour une bestiole de son gabarit.</p>" +
-      "<p>De jour ou de nuit, soyez attentifs !</p>" +
-      "<p>De jour : À intervalle de temps variable, l’ombre du pied (ou de la main) d’un humain malveillant apparaît à l’écran et indique alors au joueur la zone à fuir au plus vite. Si la fourmi se trouve sous le pied (ou la main) de l’humain au moment où il (ou elle) touche le sol, c’est la mort assurée.</p>" +
-      "<p>De nuit : Un crapaud tapi dans la pénombre attend que la fourmi entre dans son champ de vision pour la manger. Avancez à tatons pour localiser le danger et faire grimper votre score.</p>" +
+    "<h3>Règles du jeu</h3>" +
+      "<p>Votre objectif est de permettre à <em>Marie la fourmi</em> de survivre le plus longtemps possible dans ce monde trop hostile pour cet insecte de petite taille.</p>" +
+      "<p>De jour, comme de nuit, soyez attentifs !</p>" +
+      "<p>De jour : à intervalle de temps variable, l’ombre du pied (ou de la main) d’un humain malveillant apparaît à l’écran et indique alors au joueur la zone à fuir au plus vite. Si la fourmi se trouve sous le pied (ou la main) de l’humain au moment où il (ou elle) touche le sol, c’est la mort assurée.</p>" +
+      "<p>De nuit : un crapaud tapi dans la pénombre attend que la fourmi entre dans son champ de vision pour la manger. Avancez à tâtons pour localiser le danger et faire grimper votre score.</p>" +
+      "<p>Commandes : <br/>ECHAP : quitter une partie en cours à tout moment. <br/>ESPACE: indique à Marie d'arrêter de manger et de fuir vers une autre graine en urgence.</p> " +
       "<h3>Crédits</h3>" +
-      "<p><strong>Insecte-qui-peut!</strong> est un projet étudiant du M2 CIM (DT), développé par <strong>Matthieu Guillemin</strong> et <strong>Guillaume Hostache</strong>. \nOn remercie les livres \"Drôles de petites bêtes\" pour l'inspiration :)</p>"
+      '<p><strong>Insecte-qui-peut!</strong> est un projet étudiant du M2 CIM (DT), développé par <strong>Matthieu Guillemin</strong> et <strong>Guillaume Hostache</strong>. \nOn remercie les livres "Drôles de petites bêtes" pour l\'inspiration :)</p>'
   );
 
   infosPopUp.style("background-color", isNightMode ? "#34495e" : "#ecf0f1");
   infosPopUp.style("color", isNightMode ? "#ecf0f1" : "#34495e");
-  infosPopUp.addClass('infosPopUp');
+  infosPopUp.addClass("infosPopUp");
 
   let okDiv = createDiv();
   okDiv.addClass("ok");
@@ -143,7 +163,7 @@ function drawHomeScreen() {
 
   fill(isNightMode ? "#bdc3c7" : "#386641");
   circle(0, height, width / 4);
-  circle(width, 0, width /4);
+  circle(width, 0, width / 4);
 
   fill(isNightMode ? "#ffffff" : "#000000");
   textAlign(CENTER, CENTER);
@@ -153,20 +173,23 @@ function drawHomeScreen() {
 
 function drawGameModeSelection() {
   dayModeButton = createButton("Jour");
-  dayModeButton.size(150, 60);
+  dayModeButton.size(windowWidth / 12, 60);
   dayModeButton.mousePressed(() => {
     isNightMode = false;
     updateButtonStyles();
   });
-  dayModeButton.position(width / 2 - 160, height / 3);
+  dayModeButton.position(
+    windowWidth / 2 - dayModeButton.width - 30,
+    height / 3
+  );
 
   nightModeButton = createButton("Nuit");
-  nightModeButton.size(150, 60);
+  nightModeButton.size(windowWidth / 12, 60);
   nightModeButton.mousePressed(() => {
     isNightMode = true;
     updateButtonStyles();
   });
-  nightModeButton.position(width / 2 + 10, height / 3);
+  nightModeButton.position(windowWidth / 2 + 30, height / 3);
 
   updateButtonStyles();
 }
@@ -183,12 +206,15 @@ function updateButtonStyles() {
 
 function drawGameTimeSelection() {
   timerSlider = createSlider(0, 300, timer);
-  timerSlider.position(windowWidth / 2 - 162.5, height / 2 + height / 12);
-  timerSlider.style("width", "350px");
+  timerSlider.size(windowWidth / 3, 15);
+  timerSlider.position(
+    windowWidth / 2 - timerSlider.width / 2,
+    height / 3 + height / 6
+  );
 
   gameTimerLabel = createDiv("");
   gameTimerLabel.position(timerSlider.x, timerSlider.y - 30);
-  gameTimerLabel.style("font-size", "16px");
+  gameTimerLabel.style("font-size", "18px");
 }
 
 function startGame() {
@@ -219,7 +245,12 @@ function startGame() {
     humans = [];
     seeds = [];
     predators = [];
-    marie = new Marie(antImg, width / 2, height / 2, isNightMode ? nightCanvas : null);
+    marie = new Marie(
+      antImg,
+      width / 2,
+      height / 2,
+      isNightMode ? nightCanvas : null
+    );
 
     if (isNightMode) {
       summerNightAmbiance.amp(0.1);
@@ -229,49 +260,6 @@ function startGame() {
       predators.push(new Predator(width / 8, height / 8));
     }
   }, 100);
-}
-
-// à chaque clique/touche, on dépose une graine de taille aléatoire
-function touchStarted() {
-  if (bStartGame && !bGamePaused) {
-    let seed = new Seed(mouseX, mouseY, Math.floor(Math.random() * 35) + 15, seedImg);
-
-    if (isNightMode) {
-      /* Mode nuit, on ne peut poserles graines que dans le champ de vision de Marie 
-      distance entre la touche (graine) et marie */
-      let distanceToMarie = dist(
-        marie.coordinate.x,
-        marie.coordinate.y,
-        mouseX,
-        mouseY
-      );
-
-      // On définit aussi un angle pour les deux autres cercles qui font office de vision de l'insecte
-      let angleToMouse = atan2(
-        mouseY - marie.coordinate.y,
-        mouseX - marie.coordinate.x
-      );
-
-      let angleDiff = abs(angleToMouse - marie.currentAngle);
-      if (angleDiff > PI) angleDiff = TWO_PI - angleDiff;
-
-      /* Triple vérification : premier cercle, second cercle et dernier cercle de vision
-      très approximatif */
-      if (
-        distanceToMarie < 40 ||
-        (distanceToMarie >= 40 &&
-          distanceToMarie <= 100 &&
-          angleDiff < radians(60)) ||
-        (distanceToMarie > 100 &&
-          distanceToMarie <= 125 &&
-          angleDiff < radians(30))
-      ) {
-        seeds.push(seed);
-      }
-    } else {
-      seeds.push(seed);
-    }
-  }
 }
 
 function drawGameInfo() {
@@ -333,7 +321,7 @@ function drawEndGamePopUp(title, timeMessage, scoreMessage) {
   restartButton.mousePressed(replayGame);
 }
 
-// relance une partie identique
+// relance une partie identique à la précédente
 function replayGame() {
   if (endGamePopUp) endGamePopUp.remove();
 
@@ -353,19 +341,86 @@ function newGame() {
   setup();
 }
 
+// à chaque clique/touche, on dépose une graine de taille aléatoire
+function touchStarted() {
+  if (bStartGame && !bGamePaused) {
+    let seed = new Seed(
+      mouseX,
+      mouseY,
+      Math.floor(Math.random() * 35) + 15,
+      seedImg
+    );
+
+    if (isNightMode) {
+      /* Mode nuit, on ne peut poserles graines que dans le champ de vision de Marie 
+      distance entre la touche (graine) et marie */
+      let distanceToMarie = dist(
+        marie.coordinate.x,
+        marie.coordinate.y,
+        mouseX,
+        mouseY
+      );
+
+      // On définit aussi un angle pour les deux autres cercles qui font office de vision de l'insecte
+      let angleToMouse = atan2(
+        mouseY - marie.coordinate.y,
+        mouseX - marie.coordinate.x
+      );
+
+      let angleDiff = abs(angleToMouse - marie.currentAngle);
+      if (angleDiff > PI) angleDiff = TWO_PI - angleDiff;
+
+      /* Triple vérification : premier cercle, second cercle et dernier cercle de vision
+      très approximatif */
+      if (
+        distanceToMarie < 40 ||
+        (distanceToMarie >= 40 &&
+          distanceToMarie <= 100 &&
+          angleDiff < radians(60)) ||
+        (distanceToMarie > 100 &&
+          distanceToMarie <= 125 &&
+          angleDiff < radians(30))
+      ) {
+        seeds.push(seed);
+      }
+    } else {
+      seeds.push(seed);
+    }
+  }
+}
+
+function keyPressed() {
+  // interaction clavier avec la touche ENTER pour lancer la partie
+  if (!bStartGame && keyCode === ENTER) {
+    runGame();
+  }
+
+  /* interaction clavier avec la touche ESPACE pour permettre au joueur
+  d'abandonner la graine courante pour un déplacement en urgence vers une autre graine (fuite) */
+  if (bStartGame && marie != null && seeds != null && keyCode === 32) {
+    marie.leakInPanic(seeds);
+  }
+
+  // Quitter le jeu en appuyant sur echap
+  if (bStartGame && keyCode === ESCAPE) {
+    newGame();
+  }
+}
+
 /* Boucle principale du jeu : Si le jeu n'a pas commencé, on dessine certains éléments 
-et certaines animations de l'accueil. Quand la partie commence, gère le jeu 
+et certaines animations de l'accueil. Quand la partie commence, on gère le jeu 
 en fonction des paramètres de la partie. */
 function draw() {
   if (!bStartGame) {
     drawHomeScreen();
+    drawAntFoot();
 
     gameTimerLabel.style("color", isNightMode ? "#ffffff" : "#000000");
 
     gameTimerLabel.html(
-      'Arriverez-vous à survivre pendant <strong>' +
+      "Arriverez-vous à survivre pendant <strong>" +
         timerSlider.value() +
-        '</strong> secondes...'
+        "</strong> secondes..."
     );
 
     if (timerSlider.value() === 0) {
@@ -376,42 +431,37 @@ function draw() {
 
   if (bGamePaused) return; // On fige la partie -> utile pour les fins de partie
 
-  if (!isNightMode) {
-    background("white");
-    let x, y;
-    for (x = 0; x <= width; x += dayBackground.width) {
-      for (y = 0; y <= height; y += dayBackground.height) {
-        image(dayBackground, x, y);
-      }
+  // Dans notre situation, les deux images de fond ont la même taille (626x626) -> Mais quelle chance !
+  for (let x = 0; x <= width; x += dayBackground.width) {
+    for (let y = 0; y <= height; y += dayBackground.height) {
+      image(!isNightMode ? dayBackground : nightBackground, x, y);
     }
+  }
 
+  if (!isNightMode) {
     // On génère une ombre d'ennemi toutes les 30 frames
     if (frameCount % 30 === 0) {
       let alea = Math.random();
       humans.push(
-        new Human(random(0, width), random(150, height), alea > 0.5 ? humanFoot : humanHand, isNightMode)
+        new Human(
+          random(0, width),
+          random(150, height),
+          alea > 0.5 ? humanFoot : humanHand
+        )
       );
     }
 
     humans = humans.filter((h) => {
       h.draw();
-      if (h.sx > 160) {
+      if (h.hWidth > 160) {
         let touche = h.detectInsect(marie.coordinate.x, marie.coordinate.y);
         if (touche) {
           bGameOver = true;
         }
       }
-      return h.sx < 220;
+      return h.hHeight < 220;
     });
   } else {
-    background("black");
-    let x, y;
-    for (x = 0; x <= width; x += nightBackground.width) {
-      for (y = 0; y <= height; y += nightBackground.height) {
-        image(nightBackground, x, y);
-      }
-    }
-
     predators.forEach((p) => {
       p.draw(toadImg);
       p.move();
@@ -442,11 +492,7 @@ function draw() {
     nightCanvas.rect(0, 0, width, height);
   }
 
-  if (marie.target && marie.coordinate.x < marie.target.coordinate.x) {
-    marie.draw("toTheRight");
-  } else {
-    marie.draw("toTheLeft");
-  }
+  marie.draw();
 
   if (isNightMode) image(nightCanvas, 0, 0);
 

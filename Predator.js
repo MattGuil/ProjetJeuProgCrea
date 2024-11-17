@@ -11,12 +11,16 @@ class Predator {
   }
 
   draw(img) {
-    // vision représenté par un cercle at
+    // vision représenté par un cercle sombre
     fill(0, 0, 0, 150);
     ellipse(this.coordinate.x, this.coordinate.y, this.vision * 2);
 
     // image de notre crapaud
-    image(img, this.coordinate.x - img.width / 2, this.coordinate.y - img.width / 2);
+    image(
+      img,
+      this.coordinate.x - img.width / 2,
+      this.coordinate.y - img.width / 2
+    );
   }
 
   detectInsect(insectX, insectY) {
@@ -25,29 +29,27 @@ class Predator {
   }
 
   move() {
-    // Mise à jour de la position
+    // mise à jour de la position
     this.coordinate.x += this.direction.x * this.speed;
     this.coordinate.y += this.direction.y * this.speed;
 
-    // Gestion des collisions avec les bords
+    // gestion des collisions avec les bords
     if (
       this.coordinate.x - this.size / 2 < 0 ||
       this.coordinate.x + this.size / 2 > width
     ) {
-      this.direction.x *= -1; // Inverser la direction horizontale
+      this.direction.x *= -1; // on inverse la direction horizontale
     }
     if (
       this.coordinate.y - this.size / 2 < 0 ||
       this.coordinate.y + this.size / 2 > height
     ) {
-      this.direction.y *= -1; // Inverser la direction verticale
+      this.direction.y *= -1; // on inverse la direction verticale
     }
 
-    // Variation aléatoire de la direction pour simuler un mouvement erratique
+    // on simule un mouvement aléatoire pour être imprévisible
     this.direction.x += random(-0.1, 0.1);
     this.direction.y += random(-0.1, 0.1);
-
-    // Re-normalisation pour garder une vitesse constante
     this.direction.normalize();
   }
 }

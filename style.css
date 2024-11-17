@@ -1,25 +1,30 @@
 @font-face {
-  font-family: 'CustomFont';
-  src: url('./fonts/SourGummy-VariableFont_wdth,wght.ttf') format('truetype');
+  font-family: "CustomFont";
+  src: url("./fonts/SourGummy-VariableFont_wdth,wght.ttf") format("truetype");
 }
 
 html,
 body {
   margin: 0;
   padding: 0;
-  font-family: 'CustomFont', sans-serif;
+  font-family: "CustomFont", sans-serif;
 }
 canvas {
   display: block;
 }
 
-div.endGamePopUp, div.infosPopUp {
+div.endGamePopUp,
+div.infosPopUp {
   padding: 15px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 500px;
+  width: 600px;
+  border-radius: 10px;
+}
+
+button {
   border-radius: 10px;
 }
 
