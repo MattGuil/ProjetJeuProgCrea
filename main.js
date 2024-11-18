@@ -1,3 +1,4 @@
+// Variables de gestion pour l'animation confetti
 let confettis = [];
 let bShowConfettis = false;
 
@@ -178,7 +179,6 @@ function removeInfosPopUp() {
 
 // Dessine l'accueil (menu) du jeu
 function drawHomeScreen() {
-
   // Dégradé de couleur pour l'écran d'accueil (différent suivant le mode de jeu sélectionné)
   let exp = isNightMode ? 600 : 1000;
 
@@ -294,6 +294,7 @@ function drawGameInfo() {
 }
 
 function throwConfettis() {
+  // On lance la musique en même temps que l'animation des confettis
   if (bPlayMusics) victoryJingle.play();
   bShowConfettis = true;
   for (let i = 0; i < 200; i++) {
@@ -465,7 +466,6 @@ function keyPressed() {
 et certaines animations de l'accueil. Quand la partie commence, on gère le jeu 
 en fonction des paramètres de la partie. */
 function draw() {
-
   if (!bStartGame) {
     // La partie n'est pas encore lancé
     drawHomeScreen();
