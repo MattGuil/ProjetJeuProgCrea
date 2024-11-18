@@ -3,7 +3,7 @@ let infinityTimer = 0;
 let saveTimer; // On garde en mémoire le temps
 let intervalTimer;
 
-let marie, seeds, humans;
+let marie, seeds, humans, fireflies;
 
 let bGameOver;
 let bStartGame = false;
@@ -76,8 +76,8 @@ function setup() {
   });
 
   infoButton = createButton("?");
-  infoButton.size(width / 16, width / 16);
-  infoButton.position(width - width / 14, height / 32);
+  infoButton.size(width / 24, width / 24);
+  infoButton.position(width - (width / 32) * 2, height / 24);
   infoButton.style("border-radius", "100px");
   infoButton.mousePressed(showInformationsPopUp);
 }
@@ -245,6 +245,7 @@ function startGame() {
     humans = [];
     seeds = [];
     predators = [];
+    fireflies = [];
     marie = new Marie(
       antImg,
       width / 2,
@@ -405,6 +406,14 @@ function keyPressed() {
   if (bStartGame && keyCode === ESCAPE) {
     newGame();
   }
+
+  /* interaction clavier avec la touche X du clavier pour déposer une luciole qui éclaire pendant quelques secondes  */
+  if (bStartGame && isNightMode && keyCode === 88) {
+    console.log("youyou", fireflies.length);
+    fireflies.push(
+      new Firefly(random(0, width), random(0, height), nightCanvas)
+    );
+  }
 }
 
 /* Boucle principale du jeu : Si le jeu n'a pas commencé, on dessine certains éléments 
@@ -462,6 +471,18 @@ function draw() {
       return h.hHeight < 220;
     });
   } else {
+    // On dessine les lucioles et on réduit leurs effets
+    fireflies = fireflies.filter((f) => {
+      console.log("fireflies", f);
+      f.draw();
+      f.animate();
+      setTimeout(() => {
+        f.vision--;
+        f.diameter = f.vision / 4;
+      }, 100);
+      return f.vision >= 0;
+    });
+
     predators.forEach((p) => {
       p.draw(toadImg);
       p.move();
