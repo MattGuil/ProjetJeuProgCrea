@@ -22,11 +22,12 @@ class Human {
     let top = this.y - this.hHeight / 2;
     let bottom = this.y + this.hHeight / 2;
 
+    // Ajustement approximatif (15) pour la collision car l'image n'est pas parfaite
     if (
-      insectX >= left &&
-      insectX <= right &&
-      insectY >= top &&
-      insectY <= bottom
+      insectX >= left + 15 &&
+      insectX <= right - 15 &&
+      insectY >= top - 15 &&
+      insectY <= bottom - 15
     ) {
       return true;
     }

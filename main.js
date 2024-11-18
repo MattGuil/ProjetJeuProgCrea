@@ -54,7 +54,7 @@ function setup() {
   summerNightAmbiance.stop();
   horrorMusic.stop();
 
-  frameRate(30); // 30 FPS
+  frameRate(60); // 60 FPS
   createCanvas(windowWidth, windowHeight);
   noStroke();
   textFont(font);
@@ -440,7 +440,7 @@ function draw() {
 
   if (!isNightMode) {
     // On génère une ombre d'ennemi toutes les 30 frames
-    if (frameCount % 30 === 0) {
+    if (frameCount % 60 === 0) {
       let alea = Math.random();
       humans.push(
         new Human(
@@ -471,13 +471,13 @@ function draw() {
     });
 
     // mode infini, ajout d'un predator toutes les 60 secondes (1800 frames) jusqu'à ce qu'il y ait 4 predateurs sur le terrain
-    if (timer === -1 && frameCount % 1800 === 0 && predators.length < 4) {
+    if (timer === -1 && frameCount % 3600 === 0 && predators.length < 4) {
       predators.push(new Predator(width / 8, height / 8));
     }
     // mode temps limité, ajout d'un predator toutes les 80 secondes (2400 frames), max 3 predateurs sur le terrain
     if (
       infinityTimer === -1 &&
-      frameCount % 2400 === 0 &&
+      frameCount % 4800 === 0 &&
       predators.length < 3
     ) {
       predators.push(new Predator(width / 8, height / 8));

@@ -7,10 +7,13 @@ class ProgressBar {
   }
 
   draw(x, y) {
+    stroke(0, 0, 0);
+    strokeWeight(1);
     fill("white");
     rect(x, y, this.width, this.height);
     fill("lightgreen");
     rect(x, y, (this.current / 100) * this.width, this.height);
+    noStroke();
   }
 
   update() {
