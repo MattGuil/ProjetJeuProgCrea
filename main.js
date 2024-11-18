@@ -1,3 +1,6 @@
+let confettis = [];
+let bShowConfettis = false;
+
 /* Variables principales représentants :
  - notre fourmi Marie
  - ses alliés les lucioles (mode nuit)
@@ -18,6 +21,8 @@ let timerSlider, gameTimerLabel;
 let bGameOver;
 let bStartGame = false;
 let bGamePaused = false; // figer le jeu en fin de partie
+let bPlayMusics = true;
+let bPlaySounds = true;
 
 let isNightMode = false;
 
@@ -25,6 +30,7 @@ let isNightMode = false;
 let dayModeButton, nightModeButton;
 let startGameButton;
 let infoButton;
+let musicsSwitchButton, soundsSwitchButton;
 
 // Pop-ups
 let endGamePopUp;
@@ -35,10 +41,12 @@ let nightCanvas;
 
 // Assets
 let antImg, seedImg, predatorImg, humanHand, humanFoot;
-let dayBackground, nightBackground;
+let dayBackground, nightBackground, confettisBackground;
 
 // Sons
-let horrorMusic, summerNightAmbiance;
+let actionMusic, horrorMusic, summerNightAmbiance;
+let victoryJingle, defeatJingle;
+let crunchSoundEffect, footSmashSoundEffect, swallowSoundEffect;
 
 let font;
 
@@ -61,18 +69,28 @@ function preload() {
   humanFoot = loadImage("assets/humanFoot.png");
 
   // Sons
+  actionMusic = loadSound("sounds/action-music.mp3");
   horrorMusic = loadSound("sounds/horror-music.mp3");
   summerNightAmbiance = loadSound("sounds/summer-night-ambiance.mp3");
+  victoryJingle = loadSound("sounds/victory-jingle.mp3");
+  defeatJingle = loadSound("sounds/defeat-jingle.mp3");
+  crunchSoundEffect = loadSound("sounds/crunch-sound-effect.mp3");
+  footSmashSoundEffect = loadSound("sounds/foot-smash-sound-effect.mp3");
+  swallowSoundEffect = loadSound("sounds/swallow-sound-effect.mp3");
 }
 
 /* Fonction qui sert de point d'entrée au jeu.
 On définit certains paramètres et on dessine une première fois l'accueil.
 Tout ce qui est impacté par un changement lié à une interaction/animation est dessiné dans draw() directement */
 function setup() {
-
-  // Arrêt des musiques (utile dans le cas où l'on relance une nouvelle partie)
-  summerNightAmbiance.stop();
-  horrorMusic.stop();
+  summerNightAmbiance.amp(0.1);
+  horrorMusic.amp(0.1);
+  actionMusic.amp(0.1);
+  victoryJingle.amp(0.3);
+  defeatJingle.amp(0.3);
+  crunchSoundEffect.amp(1);
+  footSmashSoundEffect.amp(1);
+  swallowSoundEffect.amp(1);
 
   frameRate(60); // 60 FPS
   createCanvas(windowWidth, windowHeight); // Taille de l'écran de jeu qui s'adapte à la taille de l'écran
@@ -82,11 +100,15 @@ function setup() {
   nightCanvas = createGraphics(windowWidth, windowHeight);
   nightCanvas.noStroke();
 
+  confettisBackground = createGraphics(windowWidth, windowHeight);
+  confettisBackground.noStroke();
+
   drawGameModeSelection();
   drawGameTimeSelection();
 
   startGameButton = createButton("Jouer");
-  startGameButton.size(150, 60);
+  startGameButton.size(300, 100);
+  startGameButton.addClass("startGameButton");
   startGameButton.position(width / 2 - startGameButton.width / 2, timerSlider.y + 100);
   startGameButton.mousePressed(() => {
     runGame();
@@ -97,17 +119,25 @@ function setup() {
   infoButton.position(width - (width / 32) * 2, height / 24);
   infoButton.style("border-radius", "100px");
   infoButton.mousePressed(showInformationsPopUp);
+
+  musicsSwitchButton = createButton("Musics ON/OFF");
+  musicsSwitchButton.size(100, 60);
+  musicsSwitchButton.position(25, 25);
+  musicsSwitchButton.mousePressed(() => {
+    bPlayMusics = !bPlayMusics;
+    stopAllMusics();
+  });
+
+  soundsSwitchButton = createButton("Sounds ON/OFF");
+  soundsSwitchButton.size(100, 60);
+  soundsSwitchButton.position(25, 100);
+  soundsSwitchButton.mousePressed(() => { bPlaySounds = !bPlaySounds; });
 }
 
 // Fonction appelée au clic sur le bouton startGameButton ou la touche ENTER
 function runGame() {
   // On efface le menu...
-  dayModeButton.remove();
-  nightModeButton.remove();
-  infoButton.remove();
-  timerSlider.remove();
-  gameTimerLabel.remove();
-  startGameButton.remove();
+  removeElements();
 
   // ... et on lance une partie de jeu
   startGame();
@@ -140,7 +170,10 @@ function showInformationsPopUp() {
 }
 
 function removeInfosPopUp() {
-  if (infosPopUp) infosPopUp.remove();
+  if (infosPopUp) {
+    infosPopUp.remove();
+    infosPopUp = null;
+  }
 }
 
 // Dessine l'accueil (menu) du jeu
@@ -202,7 +235,7 @@ function updateButtonStyles() {
 function drawGameTimeSelection() {
   timerSlider = createSlider(0, 300, timer);
   timerSlider.size(windowWidth / 3, 15);
-  timerSlider.position(windowWidth / 2 - timerSlider.width / 2, height / 3 + height / 6);
+  timerSlider.position(windowWidth / 2 - timerSlider.width / 2, height / 3 + height / 4);
 
   gameTimerLabel = createDiv("");
   gameTimerLabel.position(timerSlider.x, timerSlider.y - 30);
@@ -214,7 +247,6 @@ function startGame() {
   soit considéré comme un clique qui dépose une première graine */
   setTimeout(() => {
     // Initialisation du timer, tiens compte du mode infini
-    clearInterval(intervalTimer);
     if (timerSlider.value() !== 0) {
       infinityTimer = -1;
       timer = timerSlider.value();
@@ -234,19 +266,20 @@ function startGame() {
     bStartGame = true;
     bGameOver = false;
     bGamePaused = false;
+    bShowConfettis = false;
     humans = [];
     seeds = [];
     predators = [];
     fireflies = [];
+    confettis = [];
     marie = new Marie(antImg, width / 2, height / 2, isNightMode ? nightCanvas : null);
 
     // Si une partie a été lancée en mode nuit, on lance la musiques et les sons d'ambiance, et on libère un premier prédateur (crapaud)
     if (isNightMode) {
-      summerNightAmbiance.amp(0.1);
-      horrorMusic.amp(0.1);
-      summerNightAmbiance.loop();
-      horrorMusic.loop();
+      playHorrorMusic();
       predators.push(new Predator(width / 8, height / 8, predatorImg));
+    } else {
+      if (bPlayMusics) playActionMusic();
     }
   }, 100);
 }
@@ -260,6 +293,39 @@ function drawGameInfo() {
   text("SCORE " + marie.score, width / 2, height / 10);
 }
 
+function throwConfettis() {
+  if (bPlayMusics) victoryJingle.play();
+  bShowConfettis = true;
+  for (let i = 0; i < 200; i++) {
+    confettis.push(
+        new Confetti(
+            random(width),
+            random(height / 2),
+            random(5, 15),
+            color(random(255), random(255), random(255)),
+            confettisBackground
+        )
+    );
+  }
+}
+
+function drawConfettis() {
+  confettis.forEach((confetti, index) => {
+    confetti.move();
+    confetti.draw();
+
+    // Supprimez les confettis qui sortent de l'écran
+    if (confetti.isOffScreen()) {
+      confettis.splice(index, 1);
+    }
+  });
+
+  // Si tous les confettis ont disparu, désactivez l'animation
+  if (confettis.length === 0) {
+    bShowConfettis = false;
+  }
+}
+
 // Réagit à la fin d'une partie (échec ou victoire) en affichant une pop-up récapitulative permettant de rejouer ou de quitter le jeu
 function updateGameSituation() {
   /* 3 motifs d'arrêts :
@@ -268,16 +334,24 @@ function updateGameSituation() {
   - Si la partie est infini, et que le joueur a été écrasé */
 
   if ((timer === -1 && bGameOver) || timer === 0 || bGameOver) {
+    if (!bGameOver && timer === 0 && !bShowConfettis) throwConfettis();
     bGamePaused = true;
     let title, timeMessage, scoreMessage;
     if (timer >= 0) {
       title = bGameOver ? "Dommage, vous avez perdu..." : "Félicitations, vous avez réussi !";
       timeMessage = "Vous avez survécu pendant " + str(saveTimer - timer) + " secondes.";
+      if (!bGameOver) {
+        if (bPlayMusics) playActionMusic();
+      } else {
+        if (bPlayMusics) defeatJingle.play();
+        if (bPlayMusics) stopAllMusics();
+      }
     } else {
       title = "C'est terminé !";
       timeMessage = "Vous avez survécu pendant " + infinityTimer + " secondes.";
     }
     scoreMessage = "Votre score: " + marie.score;
+    clearInterval(intervalTimer);
     drawEndGamePopUp(title, timeMessage, scoreMessage);
   }
 }
@@ -302,8 +376,7 @@ function drawEndGamePopUp(title, timeMessage, scoreMessage) {
 
 // Relance une partie identique à la précédente
 function replayGame() {
-  if (endGamePopUp) endGamePopUp.remove();
-
+  removeElements();
   startGame();
 }
 
@@ -315,7 +388,7 @@ function newGame() {
 
   bStartGame = false;
 
-  if (endGamePopUp) endGamePopUp.remove();
+  removeElements();
 
   setup();
 }
@@ -392,6 +465,7 @@ function keyPressed() {
 et certaines animations de l'accueil. Quand la partie commence, on gère le jeu 
 en fonction des paramètres de la partie. */
 function draw() {
+
   if (!bStartGame) {
     // La partie n'est pas encore lancé
     drawHomeScreen();
@@ -406,7 +480,7 @@ function draw() {
     return;
   }
 
-  if (bGamePaused) return; // On fige la partie
+  if (bGamePaused && !bShowConfettis) return;
 
   /* On dessine le fond (de jour comme de nuit)
   Hack bien sympathique, car ici, nos deux images de fond sont de même taille */
@@ -432,7 +506,10 @@ function draw() {
     predators.forEach((p) => {
       p.draw(predatorImg);
       p.move();
-      if (p.detectInsect(marie.coordinate.x, marie.coordinate.y)) bGameOver = true;
+      if (p.detectInsect(marie.coordinate.x, marie.coordinate.y)) {
+        if (bPlaySounds) swallowSoundEffect.play();
+        bGameOver = true;
+      }
     });
 
     /* Condition pour ajouter un prédateur :
@@ -464,13 +541,23 @@ function draw() {
       humans.push(new Human(random(0, width), random(150, height), alea > 0.5 ? humanFoot : humanHand));
     }
 
+    let nbHumansBefore = humans.length;
+
     humans = humans.filter((h) => {
       h.draw();
-      if ((h.hWidth > 160) && (h.detectInsect(marie.coordinate.x, marie.coordinate.y))) {
-        bGameOver = true;
+      if (h.hWidth > 160) {
+        if (h.detectInsect(marie.coordinate.x, marie.coordinate.y)) {
+          bGameOver = true;
+        }
       }
       return h.hHeight < 220;
     });
+
+    let nbHumansAfter = humans.length;
+
+    for (let i = 0; i < nbHumansBefore - nbHumansAfter; i++) {
+      if (bPlaySounds) footSmashSoundEffect.play();
+    }
 
     marie.draw();
   }
@@ -481,4 +568,31 @@ function draw() {
 
   drawGameInfo();
   updateGameSituation();
+
+  if (bShowConfettis) {
+    confettisBackground.background(0, 0, 0);
+    confettisBackground.clear();
+    drawConfettis();
+    image(confettisBackground, 0, 0);
+  }
+}
+
+function playHorrorMusic() {
+  actionMusic.stop();
+  if (!horrorMusic.isLooping() && !summerNightAmbiance.isLooping()) {
+    horrorMusic.loop();
+    summerNightAmbiance.loop();
+  }
+}
+
+function playActionMusic() {
+  horrorMusic.stop();
+  summerNightAmbiance.stop();
+  if (!actionMusic.isLooping()) actionMusic.loop();
+}
+
+function stopAllMusics() {
+  horrorMusic.stop();
+  summerNightAmbiance.stop();
+  actionMusic.stop();
 }

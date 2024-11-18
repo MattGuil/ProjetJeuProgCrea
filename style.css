@@ -13,6 +13,10 @@ canvas {
   display: block;
 }
 
+button.startGameButton {
+  font-size: 2rem;
+}
+
 div.endGamePopUp,
 div.infosPopUp {
   padding: 15px;

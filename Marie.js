@@ -41,6 +41,7 @@ class Marie {
   }
 
   startToEat() {
+    if (bPlaySounds) crunchSoundEffect.play();
     this.isEating = true;
     this.progressbar = new ProgressBar(this.target.value);
   }

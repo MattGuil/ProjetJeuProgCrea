@@ -5,24 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="18858a0b-fc11-4ca1-8121-031edbb623ff" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Confetti.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Firefly.js" beforeDir="false" afterPath="$PROJECT_DIR$/Firefly.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Human.js" beforeDir="false" afterPath="$PROJECT_DIR$/Human.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Marie.js" beforeDir="false" afterPath="$PROJECT_DIR$/Marie.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/toad.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/predator.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/style.css" afterDir="false" />
     </list>
     <list id="e5c430b4-94a4-4e9d-bc64-98744ac8ef17" name="Changes by guill" comment="" />
-    <list id="199eae30-af6a-421a-8370-827df7210c20" name="Changes by maguillemin" comment="">
-      <change beforePath="$PROJECT_DIR$/Firefly.js" beforeDir="false" afterPath="$PROJECT_DIR$/Firefly.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Human.js" beforeDir="false" afterPath="$PROJECT_DIR$/Human.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Marie.js" beforeDir="false" afterPath="$PROJECT_DIR$/Marie.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Predator.js" beforeDir="false" afterPath="$PROJECT_DIR$/Predator.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProgressBar.js" beforeDir="false" afterPath="$PROJECT_DIR$/ProgressBar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Seed.js" beforeDir="false" afterPath="$PROJECT_DIR$/Seed.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
-    </list>
+    <list id="199eae30-af6a-421a-8370-827df7210c20" name="Changes by maguillemin" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,118 +21,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/main.js">
-      <ranges>
-        <range start1="0" end1="0" start2="0" end2="10" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="4" end1="4" start2="14" end2="15" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="5" end1="7" start2="16" end2="17" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="9" end1="10" start2="19" end2="19" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="12" end1="14" start2="21" end2="22" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="15" end1="18" start2="23" end2="25" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="20" end1="20" start2="27" end2="29" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="23" end1="24" start2="32" end2="33" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="25" end1="26" start2="34" end2="34" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="27" end1="28" start2="35" end2="37" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="29" end1="30" start2="38" end2="40" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="31" end1="31" start2="41" end2="43" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="33" end1="34" start2="45" end2="49" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="36" end1="36" start2="51" end2="52" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="39" end1="39" start2="55" end2="56" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="41" end1="42" start2="58" end2="59" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="45" end1="45" start2="62" end2="63" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="49" end1="52" start2="67" end2="70" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="53" end1="53" start2="71" end2="73" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="57" end1="58" start2="77" end2="78" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="69" end1="73" start2="89" end2="90" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="84" end1="119" start2="101" end2="102" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="120" end1="121" start2="103" end2="104" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="128" end1="128" start2="111" end2="112" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="131" end1="131" start2="115" end2="116" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="138" end1="139" start2="123" end2="124" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="160" end1="160" start2="145" end2="146" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="161" end1="162" start2="147" end2="160" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="168" end1="168" start2="166" end2="168" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="180" end1="184" start2="180" end2="181" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="197" end1="197" start2="194" end2="195" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="199" end1="203" start2="197" end2="198" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="209" end1="213" start2="204" end2="205" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="248" end1="254" start2="240" end2="241" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="255" end1="255" start2="242" end2="243" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="260" end1="261" start2="248" end2="249" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="265" end1="265" start2="253" end2="254" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="268" end1="273" start2="257" end2="258" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="277" end1="277" start2="262" end2="263" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="278" end1="280" start2="264" end2="269" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="284" end1="289" start2="273" end2="275" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="298" end1="298" start2="284" end2="285" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="299" end1="309" start2="286" end2="287" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="324" end1="325" start2="302" end2="303" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="331" end1="332" start2="309" end2="310" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="344" end1="345" start2="322" end2="323" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="347" end1="353" start2="325" end2="326" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="354" end1="354" start2="327" end2="329" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="355" end1="363" start2="330" end2="334" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="365" end1="369" start2="336" end2="337" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="370" end1="370" start2="338" end2="339" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="373" end1="384" start2="342" end2="355" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="386" end1="386" start2="357" end2="358" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="393" end1="394" start2="365" end2="366" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="398" end1="399" start2="370" end2="371" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="409" end1="410" start2="381" end2="383" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="411" end1="415" start2="384" end2="387" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="423" end1="423" start2="395" end2="396" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="424" end1="425" start2="397" end2="397" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="427" end1="433" start2="399" end2="400" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="437" end1="437" start2="404" end2="405" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="440" end1="441" start2="408" end2="409" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="442" end1="443" start2="410" end2="412" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="449" end1="507" start2="418" end2="419" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="509" end1="510" start2="421" end2="423" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="513" end1="513" start2="426" end2="475" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="515" end1="520" start2="477" end2="479" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/Firefly.js">
-      <ranges>
-        <range start1="0" end1="0" start2="0" end2="6" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="1" end1="2" start2="7" end2="19" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="8" end1="9" start2="25" end2="28" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="11" end1="11" start2="30" end2="31" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="12" end1="19" start2="32" end2="45" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="21" end1="23" start2="47" end2="58" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="24" end1="24" start2="59" end2="68" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/Marie.js">
-      <ranges>
-        <range start1="0" end1="0" start2="0" end2="8" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="1" end1="2" start2="9" end2="26" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="7" end1="9" start2="31" end2="33" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="15" end1="16" start2="39" end2="39" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="19" end1="26" start2="42" end2="64" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="28" end1="28" start2="66" end2="77" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="29" end1="29" start2="78" end2="127" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="30" end1="43" start2="128" end2="133" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="44" end1="94" start2="134" end2="134" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="96" end1="96" start2="136" end2="153" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="99" end1="99" start2="156" end2="157" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="111" end1="115" start2="169" end2="172" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="118" end1="123" start2="175" end2="180" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-        <range start1="126" end1="163" start2="183" end2="185" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/Human.js">
-      <ranges>
-        <range start1="0" end1="0" start2="0" end2="6" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="1" end1="1" start2="7" end2="17" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="9" end1="9" start2="25" end2="26" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="14" end1="14" start2="31" end2="32" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="18" end1="18" start2="36" end2="37" changelist="199eae30-af6a-421a-8370-827df7210c20" />
-        <range start1="24" end1="34" start2="43" end2="48" changelist="18858a0b-fc11-4ca1-8121-031edbb623ff" />
-      </ranges>
-    </file>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
@@ -191,5 +70,16 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
