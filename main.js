@@ -435,6 +435,9 @@ function drawEndGamePopUp(title, timeMessage, scoreMessage) {
 // Relance une partie identique à la précédente
 function replayGame() {
   removeElements();
+  bShowConfettis = false;
+  clear();
+  confettisBackground.clear();
   if (endGamePopUp) {
     endGamePopUp.remove();
     endGamePopUp = null;
