@@ -84,6 +84,17 @@ function preload() {
 On définit certains paramètres et on dessine une première fois l'accueil.
 Tout ce qui est impacté par un changement lié à une interaction/animation est dessiné dans draw() directement */
 function setup() {
+
+  let details = navigator.userAgent;
+  let regexp = /android|iphone|kindle|ipad/i;
+  let isMobileDevice = regexp.test(details);
+
+  if (isMobileDevice) {
+    console.log("You are using a Mobile Device");
+  } else {
+    console.log("You are using Desktop");
+  }
+
   summerNightAmbiance.amp(0.1);
   horrorMusic.amp(0.1);
   actionMusic.amp(0.1);
