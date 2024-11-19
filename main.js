@@ -643,6 +643,8 @@ function draw() {
 }
 
 function playHorrorMusic() {
+  victoryJingle.stop();
+  defeatJingle.stop();
   actionMusic.stop();
   if (!horrorMusic.isLooping() && !summerNightAmbiance.isLooping()) {
     horrorMusic.loop();
@@ -651,6 +653,8 @@ function playHorrorMusic() {
 }
 
 function playActionMusic() {
+  victoryJingle.stop();
+  defeatJingle.stop();
   horrorMusic.stop();
   summerNightAmbiance.stop();
   if (!actionMusic.isLooping()) actionMusic.loop();
