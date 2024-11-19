@@ -13,6 +13,19 @@ canvas {
   display: block;
 }
 
+button.musicsSwitchButton, button.soundsSwitchButton {
+  &.on {
+    span.off {
+      display: none;
+    }
+  }
+  &.off {
+    span.on {
+      display: none;
+    }
+  }
+}
+
 button.startGameButton {
   font-size: 2rem;
 }

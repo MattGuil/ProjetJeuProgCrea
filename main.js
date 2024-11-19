@@ -121,18 +121,38 @@ function setup() {
   infoButton.style("border-radius", "100px");
   infoButton.mousePressed(showInformationsPopUp);
 
-  musicsSwitchButton = createButton("Musics ON/OFF");
+  musicsSwitchButton = createButton("Musics<br><span class='on'>ON</span><span class='off'>OFF</span>");
   musicsSwitchButton.size(100, 60);
   musicsSwitchButton.position(25, 25);
+  musicsSwitchButton.addClass('musicsSwitchButton on');
   musicsSwitchButton.mousePressed(() => {
     bPlayMusics = !bPlayMusics;
+    if (bPlayMusics) {
+      musicsSwitchButton.addClass('on');
+      musicsSwitchButton.removeClass('off');
+    }
+    else {
+      musicsSwitchButton.addClass('off');
+      musicsSwitchButton.removeClass('on');
+    }
     stopAllMusics();
   });
 
-  soundsSwitchButton = createButton("Sounds ON/OFF");
+  soundsSwitchButton = createButton("Sounds<br><span class='on'>ON</span><span class='off'>OFF</span>");
   soundsSwitchButton.size(100, 60);
   soundsSwitchButton.position(25, 100);
-  soundsSwitchButton.mousePressed(() => { bPlaySounds = !bPlaySounds; });
+  soundsSwitchButton.addClass('soundsSwitchButton on');
+  soundsSwitchButton.mousePressed(() => {
+    bPlaySounds = !bPlaySounds;
+    if (bPlaySounds) {
+      soundsSwitchButton.addClass('on');
+      soundsSwitchButton.removeClass('off');
+    }
+    else {
+      soundsSwitchButton.addClass('off');
+      soundsSwitchButton.removeClass('on');
+    }
+  });
 }
 
 // Fonction appelée au clic sur le bouton startGameButton ou la touche ENTER
@@ -274,9 +294,25 @@ function startGame() {
     confettis = [];
     marie = new Marie(antImg, width / 2, height / 2, isNightMode ? nightCanvas : null);
 
+    // Activation des actions spéciales (fuite et luciole) sur mobile
+    /*
+    marie.touchStarted(() => {
+      console.log("MARIE TOUCHED")
+      if (isNightMode) {
+        if (fireflies.length < 7 && marie) {
+          fireflies.push(new Firefly(marie.coordinate.x, marie.coordinate.y, nightCanvas));
+        }
+      } else {
+        if (seeds != null) {
+          marie.leakInPanic(seeds);
+        }
+      }
+    });
+    */
+
     // Si une partie a été lancée en mode nuit, on lance la musiques et les sons d'ambiance, et on libère un premier prédateur (crapaud)
     if (isNightMode) {
-      playHorrorMusic();
+      if (bPlayMusics) playHorrorMusic();
       predators.push(new Predator(width / 8, height / 8, predatorImg));
     } else {
       if (bPlayMusics) playActionMusic();
@@ -506,7 +542,7 @@ function draw() {
     predators.forEach((p) => {
       p.draw(predatorImg);
       p.move();
-      if (p.detectInsect(marie.coordinate.x, marie.coordinate.y)) {
+      if (p.detectInsect(marie.coordinate.x, marie.coordinate.y) && !bShowConfettis) {
         if (bPlaySounds) swallowSoundEffect.play();
         bGameOver = true;
       }
@@ -546,7 +582,7 @@ function draw() {
     humans = humans.filter((h) => {
       h.draw();
       if (h.hWidth > 160) {
-        if (h.detectInsect(marie.coordinate.x, marie.coordinate.y)) {
+        if (h.detectInsect(marie.coordinate.x, marie.coordinate.y) && !bShowConfettis) {
           bGameOver = true;
         }
       }
