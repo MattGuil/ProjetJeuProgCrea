@@ -282,6 +282,7 @@ function startGame() {
   /* Timeout de 100 ms, nécessaire pour éviter que le clique sur le bouton de lancement de jeu 
   soit considéré comme un clique qui dépose une première graine */
   setTimeout(() => {
+    clearInterval(intervalTimer);
     // Initialisation du timer, tiens compte du mode infini
     if (timerSlider.value() !== 0) {
       infinityTimer = -1;
@@ -434,6 +435,10 @@ function drawEndGamePopUp(title, timeMessage, scoreMessage) {
 // Relance une partie identique à la précédente
 function replayGame() {
   removeElements();
+  if (endGamePopUp) {
+    endGamePopUp.remove();
+    endGamePopUp = null;
+  }
   startGame();
 }
 
@@ -446,6 +451,7 @@ function newGame() {
   bStartGame = false;
 
   removeElements();
+  if (endGamePopUp) endGamePopUp.remove();
 
   setup();
 }
@@ -643,8 +649,6 @@ function draw() {
 }
 
 function playHorrorMusic() {
-  victoryJingle.stop();
-  defeatJingle.stop();
   actionMusic.stop();
   if (!horrorMusic.isLooping() && !summerNightAmbiance.isLooping()) {
     horrorMusic.loop();
@@ -653,8 +657,6 @@ function playHorrorMusic() {
 }
 
 function playActionMusic() {
-  victoryJingle.stop();
-  defeatJingle.stop();
   horrorMusic.stop();
   summerNightAmbiance.stop();
   if (!actionMusic.isLooping()) actionMusic.loop();
