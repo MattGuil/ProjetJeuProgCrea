@@ -54,6 +54,7 @@ let font;
 /* boolean pour détecter si l'appareil est un téléphone ou non.
 on s'en sert pour intégrer des boutons pour chaque interaction clavier disponible sur ordinateur */
 let bIsMobile;
+
 // les 3 boutons qui correspondent aux 3 interactions clavier sur mobile
 let echapButton, leakButton, fireflyButton;
 
@@ -99,7 +100,6 @@ On définit certains paramètres et on dessine une première fois l'accueil.
 Tout ce qui est impacté par un changement lié à une interaction/animation est dessiné dans draw() directement */
 function setup() {
   bIsMobile = detectIsMobileDevice();
-  console.log("Sur téléphone :", bIsMobile);
 
   summerNightAmbiance.amp(0.1);
   horrorMusic.amp(0.1);
@@ -310,22 +310,6 @@ function startGame() {
     confettis = [];
     marie = new Marie(antImg, width / 2, height / 2, isNightMode ? nightCanvas : null);
 
-    // Activation des actions spéciales (fuite et luciole) sur mobile
-    /*
-    marie.touchStarted(() => {
-      console.log("MARIE TOUCHED")
-      if (isNightMode) {
-        if (fireflies.length < 7 && marie) {
-          fireflies.push(new Firefly(marie.coordinate.x, marie.coordinate.y, nightCanvas));
-        }
-      } else {
-        if (seeds != null) {
-          marie.leakInPanic(seeds);
-        }
-      }
-    });
-    */
-
     // Si une partie a été lancée en mode nuit, on lance la musique et les sons d'ambiance, et on libère un premier prédateur (crapaud)
     if (isNightMode) {
       if (bPlayMusics) playHorrorMusic();
@@ -348,28 +332,23 @@ function drawGameInfo() {
   if (bIsMobile) {
     echapButton = createButton("Quitter");
     echapButton.addClass("echapButton");
-    echapButton.size(width / 6, 80);
+    echapButton.size(width / 12, 60);
     echapButton.mousePressed(() => {
       if (bStartGame) newGame();
     });
 
     leakButton = createButton("Fuire");
     leakButton.addClass("leakButton");
-    leakButton.size(width / 6, 80);
+    leakButton.size(width / 12, 60);
     leakButton.mousePressed(leakAction);
 
     if (isNightMode) {
       fireflyButton = createButton("Luciole");
       fireflyButton.addClass("fireflyButton");
-      fireflyButton.size(width / 6, 80);
+      fireflyButton.size(width / 12, 60);
       fireflyButton.mousePressed(addNewFirefly);
-
-      console.log(fireflyButton);
     }
   }
-
-  console.log(echapButton);
-  console.log(leakButton);
 }
 
 function throwConfettis() {
