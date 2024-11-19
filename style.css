@@ -9,8 +9,21 @@ body {
   padding: 0;
   font-family: "CustomFont", sans-serif;
 }
+
 canvas {
   display: block;
+}
+
+/* Home Screen */
+
+button {
+  background-color: #ecf0f1;
+  color: #34495e;
+}
+
+button.nightMode {
+  background-color: #34495e;
+  color: #ecf0f1;
 }
 
 button.musicsSwitchButton, button.soundsSwitchButton {
@@ -26,12 +39,71 @@ button.musicsSwitchButton, button.soundsSwitchButton {
   }
 }
 
+button.infoButton {
+  border-radius: 100px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+}
+
+button.dayModeButton {
+  background-color: #ffffff;
+  color: #000000;
+
+  &.nightMode {
+    background-color: #7f8c8d;
+    color: #ecf0f1;
+  }
+}
+
+button.nightModeButton {
+  background-color: #bdc3c7;
+  color: #2c3e50;
+
+  &.nightMode {
+    background-color: #34495e;
+    color: #ecf0f1;
+  }
+}
+
+div.gameTimerLabel {
+  font-size: 18px;
+  color: #000000;
+
+  &.nightMode {
+    color: #ffffff;
+  }
+}
+
+slider.timerSlider {
+
+}
+
 button.startGameButton {
   font-size: 2rem;
 }
 
-div.endGamePopUp,
-div.infosPopUp {
+button.echapButton {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+}
+
+button.leakButton {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+}
+
+button.fireflyButton {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
+div.infosPopUp, div.endGamePopUp {
+  background-color: #ecf0f1;
+  color: #34495e;
   padding: 15px;
   position: absolute;
   top: 50%;
@@ -39,6 +111,11 @@ div.infosPopUp {
   transform: translate(-50%, -50%);
   width: 800px;
   border-radius: 10px;
+
+  &.nightMode {
+    background-color: #34495e;
+    color: #ecf0f1;
+  }
 }
 
 button {

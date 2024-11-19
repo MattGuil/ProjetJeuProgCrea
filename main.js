@@ -28,10 +28,10 @@ let bPlaySounds = true;
 let isNightMode = false;
 
 // Boutons
-let dayModeButton, nightModeButton;
-let startGameButton;
-let infoButton;
 let musicsSwitchButton, soundsSwitchButton;
+let infoButton;
+let modeButtonsDiv, dayModeButton, nightModeButton;
+let startGameButton;
 
 // Pop-ups
 let endGamePopUp;
@@ -50,6 +50,12 @@ let victoryJingle, defeatJingle;
 let crunchSoundEffect, footSmashSoundEffect, swallowSoundEffect;
 
 let font;
+
+/* boolean pour détecter si l'appareil est un téléphone ou non.
+on s'en sert pour intégrer des boutons pour chaque interaction clavier disponible sur ordinateur */
+let bIsMobile;
+// les 3 boutons qui correspondent aux 3 interactions clavier sur mobile
+let echapButton, leakButton, fireflyButton;
 
 function preload() {
 
@@ -80,10 +86,21 @@ function preload() {
   swallowSoundEffect = loadSound("sounds/swallow-sound-effect.mp3");
 }
 
+function detectIsMobileDevice() {
+  let details = navigator.userAgent;
+  let regexp = /android|iphone|kindle|ipad/i;
+
+  // retourn true si on est détecte un appareil mobile
+  return regexp.test(details);
+}
+
 /* Fonction qui sert de point d'entrée au jeu.
 On définit certains paramètres et on dessine une première fois l'accueil.
 Tout ce qui est impacté par un changement lié à une interaction/animation est dessiné dans draw() directement */
 function setup() {
+  bIsMobile = detectIsMobileDevice();
+  console.log("Sur téléphone :", bIsMobile);
+
   summerNightAmbiance.amp(0.1);
   horrorMusic.amp(0.1);
   actionMusic.amp(0.1);
@@ -108,21 +125,20 @@ function setup() {
   drawGameTimeSelection();
 
   startGameButton = createButton("Jouer");
-  startGameButton.size(300, 100);
   startGameButton.addClass("startGameButton");
+  startGameButton.size(width/4, 100);
   startGameButton.position(width / 2 - startGameButton.width / 2, timerSlider.y + 100);
   startGameButton.mousePressed(() => {
     runGame();
   });
 
   infoButton = createButton("?");
-  infoButton.size(width / 24, width / 24);
-  infoButton.position(width - (width / 32) * 2, height / 24);
-  infoButton.style("border-radius", "100px");
+  infoButton.size(width / 20, width / 20);
+  infoButton.addClass("infoButton");
   infoButton.mousePressed(showInformationsPopUp);
 
   musicsSwitchButton = createButton("Musics<br><span class='on'>ON</span><span class='off'>OFF</span>");
-  musicsSwitchButton.size(100, 60);
+  musicsSwitchButton.size(80, 80);
   musicsSwitchButton.position(25, 25);
   musicsSwitchButton.addClass('musicsSwitchButton on');
   musicsSwitchButton.mousePressed(() => {
@@ -139,8 +155,8 @@ function setup() {
   });
 
   soundsSwitchButton = createButton("Sounds<br><span class='on'>ON</span><span class='off'>OFF</span>");
-  soundsSwitchButton.size(100, 60);
-  soundsSwitchButton.position(25, 100);
+  soundsSwitchButton.size(80, 80);
+  soundsSwitchButton.position(125, 25);
   soundsSwitchButton.addClass('soundsSwitchButton on');
   soundsSwitchButton.mousePressed(() => {
     bPlaySounds = !bPlaySounds;
@@ -176,15 +192,12 @@ function showInformationsPopUp() {
       "<h3>Crédits</h3>" +
       '<p><strong>Insecte-qui-peut!</strong> est un projet étudiant du M2 CIM (DT), développé par <strong>Matthieu Guillemin</strong> et <strong>Guillaume Hostache</strong>. \nOn remercie les livres "Drôles de petites bêtes" pour l\'inspiration :)</p>'
   );
-
-  infosPopUp.style("background-color", isNightMode ? "#34495e" : "#ecf0f1");
-  infosPopUp.style("color", isNightMode ? "#ecf0f1" : "#34495e");
   infosPopUp.addClass("infosPopUp");
 
   let okDiv = createDiv();
   okDiv.addClass("ok");
-
   okDiv.parent(infosPopUp);
+
   let okButton = createButton("OK");
   okButton.parent(okDiv);
   okButton.mousePressed(removeInfosPopUp);
@@ -199,6 +212,8 @@ function removeInfosPopUp() {
 
 // Dessine l'accueil (menu) du jeu
 function drawHomeScreen() {
+  (bIsMobile) ? applyMobileStyle() : applyDesktopStyle();
+
   // Dégradé de couleur pour l'écran d'accueil (différent suivant le mode de jeu sélectionné)
   let exp = isNightMode ? 600 : 1000;
 
@@ -225,41 +240,42 @@ function drawHomeScreen() {
 }
 
 function drawGameModeSelection() {
+
+  modeButtonsDiv = createDiv();
+  modeButtonsDiv.addClass("modeButtonsDiv");
+
   dayModeButton = createButton("Jour");
-  dayModeButton.size(windowWidth / 12, 60);
+  dayModeButton.addClass("dayModeButton");
+  dayModeButton.size(windowWidth / 6, 80);
+  dayModeButton.position(windowWidth / 2 - dayModeButton.width - 40, height / 3);
   dayModeButton.mousePressed(() => {
     isNightMode = false;
-    updateButtonStyles();
+    applyDayModeStyle();
   });
-  dayModeButton.position(windowWidth / 2 - dayModeButton.width - 30, height / 3);
 
   nightModeButton = createButton("Nuit");
-  nightModeButton.size(windowWidth / 12, 60);
+  nightModeButton.addClass("nightModeButton");
+  nightModeButton.size(windowWidth / 6, 80);
+  nightModeButton.position(windowWidth / 2 + 30, height / 3);
   nightModeButton.mousePressed(() => {
     isNightMode = true;
-    updateButtonStyles();
+    applyNightModeStyle();
   });
-  nightModeButton.position(windowWidth / 2 + 30, height / 3);
 
-  updateButtonStyles();
-}
+  modeButtonsDiv.child(dayModeButton);
+  modeButtonsDiv.child(nightModeButton);
 
-function updateButtonStyles() {
-  // Mise à jour des couleurs des boutons pour avoir un changement entre le mode jour et mode nuit
-  dayModeButton.style("background-color", isNightMode ? "#7f8c8d" : "#ffffff");
-  dayModeButton.style("color", isNightMode ? "#ecf0f1" : "#000000");
-  nightModeButton.style("background-color", isNightMode ? "#34495e" : "#bdc3c7");
-  nightModeButton.style("color", isNightMode ? "#ecf0f1" : "#2c3e50");
 }
 
 function drawGameTimeSelection() {
   timerSlider = createSlider(0, 300, timer);
+  timerSlider.addClass("timerSlider");
   timerSlider.size(windowWidth / 3, 15);
   timerSlider.position(windowWidth / 2 - timerSlider.width / 2, height / 3 + height / 4);
 
   gameTimerLabel = createDiv("");
+  gameTimerLabel.addClass("gameTimerLabel");
   gameTimerLabel.position(timerSlider.x, timerSlider.y - 30);
-  gameTimerLabel.style("font-size", "18px");
 }
 
 function startGame() {
@@ -310,7 +326,7 @@ function startGame() {
     });
     */
 
-    // Si une partie a été lancée en mode nuit, on lance la musiques et les sons d'ambiance, et on libère un premier prédateur (crapaud)
+    // Si une partie a été lancée en mode nuit, on lance la musique et les sons d'ambiance, et on libère un premier prédateur (crapaud)
     if (isNightMode) {
       if (bPlayMusics) playHorrorMusic();
       predators.push(new Predator(width / 8, height / 8, predatorImg));
@@ -327,6 +343,33 @@ function drawGameInfo() {
   text(timer === -1 ? "∞" : timer, width / 2, height / 24);
   textSize(18);
   text("SCORE " + marie.score, width / 2, height / 10);
+
+  // On est en mode mobile et on ajoute des boutons (pour remplacer les interactions clavier
+  if (bIsMobile) {
+    echapButton = createButton("Quitter");
+    echapButton.addClass("echapButton");
+    echapButton.size(width / 6, 80);
+    echapButton.mousePressed(() => {
+      if (bStartGame) newGame();
+    });
+
+    leakButton = createButton("Fuire");
+    leakButton.addClass("leakButton");
+    leakButton.size(width / 6, 80);
+    leakButton.mousePressed(leakAction);
+
+    if (isNightMode) {
+      fireflyButton = createButton("Luciole");
+      fireflyButton.addClass("fireflyButton");
+      fireflyButton.size(width / 6, 80);
+      fireflyButton.mousePressed(addNewFirefly);
+
+      console.log(fireflyButton);
+    }
+  }
+
+  console.log(echapButton);
+  console.log(leakButton);
 }
 
 function throwConfettis() {
@@ -396,8 +439,6 @@ function updateGameSituation() {
 // Pop-up de fin de jeu
 function drawEndGamePopUp(title, timeMessage, scoreMessage) {
   endGamePopUp = createDiv("<h3>" + title + "</h3><p>" + timeMessage + "</p><p>" + scoreMessage + "</p>");
-  endGamePopUp.style("background-color", isNightMode ? "#34495e" : "#ecf0f1");
-  endGamePopUp.style("color", isNightMode ? "#ecf0f1" : "#34495e");
   endGamePopUp.addClass("endGamePopUp");
 
   let newGameButton = createButton("Nouvelle partie");
@@ -480,8 +521,8 @@ function keyPressed() {
 
   /* Interaction clavier avec la touche ESPACE pour permettre au joueur
   d'abandonner la graine courante pour un déplacement en urgence vers une autre graine (fuite) */
-  if (bStartGame && marie != null && seeds != null && keyCode === 32) {
-    marie.leakInPanic(seeds);
+  if (keyCode === 32) {
+    leakAction();
   }
 
   // Quitter le jeu en appuyant sur echap
@@ -491,10 +532,20 @@ function keyPressed() {
 
   /* Interaction clavier avec la touche 'X' pour déposer une luciole qui éclaire pendant quelques secondes
   (on est limité à 7 lucioles à la fois) */
-  if (bStartGame && isNightMode && keyCode === 88) {
-    if (fireflies.length < 7 && marie) {
-      fireflies.push(new Firefly(marie.coordinate.x, marie.coordinate.y, nightCanvas));
-    }
+  if (keyCode === 88) {
+    addNewFirefly();
+  }
+}
+
+function leakAction() {
+  if (bStartGame && marie != null && seeds != null) {
+    marie.leakInPanic(seeds);
+  }
+}
+
+function addNewFirefly() {
+  if (bStartGame && isNightMode && fireflies.length < 7 && marie) {
+    fireflies.push(new Firefly(marie.coordinate.x, marie.coordinate.y, nightCanvas));
   }
 }
 
@@ -506,7 +557,6 @@ function draw() {
     // La partie n'est pas encore lancé
     drawHomeScreen();
 
-    gameTimerLabel.style("color", isNightMode ? "#ffffff" : "#000000");
     gameTimerLabel.html("Arriverez-vous à survivre pendant <strong>" + timerSlider.value() + "</strong> secondes...");
 
     if (timerSlider.value() === 0) {
@@ -631,4 +681,52 @@ function stopAllMusics() {
   horrorMusic.stop();
   summerNightAmbiance.stop();
   actionMusic.stop();
+}
+
+function applyMobileStyle() {
+  musicsSwitchButton.addClass("mobile");
+  soundsSwitchButton.addClass("mobile");
+  infoButton.addClass("mobile");
+  gameTimerLabel.addClass("mobile");
+  timerSlider.addClass("mobile");
+  modeButtonsDiv.addClass("mobile");
+  dayModeButton.addClass("mobile");
+  nightModeButton.addClass("mobile");
+  startGameButton.addClass("mobile");
+}
+
+function applyDesktopStyle() {
+  musicsSwitchButton.removeClass("mobile");
+  soundsSwitchButton.removeClass("mobile");
+  infoButton.removeClass("mobile");
+  gameTimerLabel.removeClass("mobile");
+  timerSlider.removeClass("mobile");
+  modeButtonsDiv.removeClass("mobile");
+  dayModeButton.removeClass("mobile");
+  nightModeButton.removeClass("mobile");
+  startGameButton.removeClass("mobile");
+}
+
+function applyDayModeStyle() {
+  musicsSwitchButton.removeClass("nightMode");
+  soundsSwitchButton.removeClass("nightMode");
+  infoButton.removeClass("nightMode");
+  gameTimerLabel.removeClass("nightMode");
+  timerSlider.removeClass("nightMode");
+  modeButtonsDiv.removeClass("nightMode");
+  dayModeButton.removeClass("nightMode");
+  nightModeButton.removeClass("nightMode");
+  startGameButton.removeClass("nightMode");
+}
+
+function applyNightModeStyle() {
+  musicsSwitchButton.addClass("nightMode");
+  soundsSwitchButton.addClass("nightMode");
+  infoButton.addClass("nightMode");
+  gameTimerLabel.addClass("nightMode");
+  timerSlider.addClass("nightMode");
+  modeButtonsDiv.addClass("nightMode");
+  dayModeButton.addClass("nightMode");
+  nightModeButton.addClass("nightMode");
+  startGameButton.addClass("nightMode");
 }
